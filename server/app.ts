@@ -1,0 +1,133 @@
+import { createServer, type IncomingMessage } from 'node:http';
+import { randomUUID } from 'node:crypto';
+import { pageInputSchema, validTree } from '../src/models/contracts.ts';
+import type { PageRepository } from './repository.ts';
+class HttpError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+async function body(req: IncomingMessage) {
+  let text = '';
+  for await (const chunk of req) {
+    text += chunk;
+    if (Buffer.byteLength(text) > 1_000_000)
+      throw new HttpError(413, 'Definición demasiado grande');
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new HttpError(400, 'JSON inválido');
+  }
+}
+export function createApi(repository: PageRepository, origins: string[]) {
+  return createServer(async (req, res) => {
+    const origin = req.headers.origin;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Vary', 'Origin');
+    if (origin && !origins.includes(origin)) {
+      res.writeHead(403);
+      res.end(JSON.stringify({ message: 'Origen no permitido' }));
+      return;
+    }
+    if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    const send = (status: number, data: unknown) => {
+      res.writeHead(status);
+      res.end(JSON.stringify(data));
+    };
+    try {
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+      const url = new URL(req.url ?? '/', 'http://localhost');
+      const path = url.pathname;
+      if (path === '/api/public/pages/by-path' && req.method === 'GET') {
+        const value = url.searchParams.get('path');
+        const page = (await repository.list()).find(
+          (p) => p.published && '/' + p.published.code === value,
+        )?.published;
+        if (!page) throw new HttpError(404, 'Página no encontrada');
+        send(200, page);
+        return;
+      }
+      if (path === '/api/pages' && req.method === 'GET') {
+        send(
+          200,
+          (await repository.list()).map((p) => p.draft),
+        );
+        return;
+      }
+      const match = /^\/api\/pages\/([^/]+)$/.exec(path);
+      const id = match?.[1];
+      if (id && req.method === 'GET') {
+        const page = (await repository.list()).find((p) => p.draft.id === id);
+        if (!page) throw new HttpError(404, 'Página no encontrada');
+        send(200, page.draft);
+        return;
+      }
+      if ((path === '/api/pages' && req.method === 'POST') || (id && req.method === 'PUT')) {
+        const parsed = pageInputSchema.safeParse(await body(req));
+        if (!parsed.success)
+          throw new HttpError(400, parsed.error.issues.map((i) => i.message).join('; '));
+        const input = parsed.data;
+        if (!validTree(input.components))
+          throw new HttpError(400, 'Árbol inválido: IDs duplicados o límites excedidos');
+        const page = await repository.transact((pages) => {
+          const existing = id ? pages.find((p) => p.draft.id === id) : undefined;
+          if (id && !existing) throw new HttpError(404, 'Página no encontrada');
+          if (
+            pages.some(
+              (p) =>
+                p.draft.id !== id &&
+                (p.draft.code === input.code || p.published?.code === input.code),
+            )
+          )
+            throw new HttpError(409, 'El código ya está en uso');
+          const now = new Date().toISOString();
+          const draft = {
+            ...input,
+            id: existing?.draft.id ?? randomUUID(),
+            createdAt: existing?.draft.createdAt ?? now,
+            updatedAt: now,
+          };
+          if (existing) {
+            existing.draft = draft;
+            if (input.status === 'published') existing.published = structuredClone(draft);
+          } else
+            pages.push({
+              draft,
+              ...(input.status === 'published' ? { published: structuredClone(draft) } : {}),
+            });
+          return draft;
+        });
+        send(id ? 200 : 201, page);
+        return;
+      }
+      if (id && req.method === 'DELETE') {
+        await repository.transact((pages) => {
+          const index = pages.findIndex((p) => p.draft.id === id);
+          if (index < 0) throw new HttpError(404, 'Página no encontrada');
+          pages.splice(index, 1);
+        });
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+      throw new HttpError(404, 'Endpoint no encontrado');
+    } catch (error) {
+      const status = error instanceof HttpError ? error.status : 500;
+      if (status === 500) console.error(error);
+      send(status, {
+        message: status === 500 ? 'Error de persistencia del servidor' : (error as Error).message,
+      });
+    }
+  });
+}

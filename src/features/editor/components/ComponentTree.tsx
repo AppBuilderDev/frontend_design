@@ -1,48 +1,50 @@
+import { useEditor } from '@craftjs/core';
+import { GripVertical } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Layers } from 'lucide-react';
 import type { ComponentNode } from '../../../models/contracts';
-import { moveNode } from '../../../state/tree';
-interface Props {
+import { ROOT } from '../craft/adapter';
+
+export function ComponentTree({
+  nodes,
+  selected,
+  ids,
+}: {
   nodes: ComponentNode[];
   selected: string;
-  onSelect: (id: string) => void;
-  onChange: (nodes: ComponentNode[]) => void;
-}
-export function ComponentTree({ nodes, selected, onSelect: setSelected, onChange: change }: Props) {
+  ids: Map<string, string>;
+}) {
+  const { actions, connectors } = useEditor();
   function tree(items: ComponentNode[]): ReactNode {
-    return items.map((n) => (
-      <div key={n.id} className="tree-item">
-        <button
-          className={'tree-row ' + (selected === n.id ? 'active' : '')}
-          draggable
-          onDragStart={(e) => e.dataTransfer.setData('text/plain', n.id)}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            change(moveNode(nodes, e.dataTransfer.getData('text/plain'), n.id));
-          }}
-          onClick={() => setSelected(n.id)}
-        >
-          <Layers size={13} />
-          <span>{n.type}</span>
-          <small>{typeof n.props.text === 'string' ? n.props.text.slice(0, 16) : ''}</small>
-        </button>
-        {n.children && <div className="tree-children">{tree(n.children)}</div>}
-      </div>
-    ));
+    return items.map((node) => {
+      const id = ids.get(node.id)!;
+      return (
+        <div key={id} className="tree-item">
+          <button
+            ref={(el) => {
+              if (el) connectors.drag(connectors.select(el, id), id);
+            }}
+            className={'tree-row ' + (selected === id ? 'active' : '')}
+            aria-label={'Seleccionar capa ' + node.type}
+            onClick={() => actions.selectNode(id)}
+          >
+            <GripVertical size={13} />
+            <span>{node.type}</span>
+            <small>{typeof node.props.text === 'string' ? node.props.text.slice(0, 16) : ''}</small>
+          </button>
+          {node.children && <div className="tree-children">{tree(node.children)}</div>}
+        </div>
+      );
+    });
   }
   return (
-    <div
-      className="tree"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        change(moveNode(nodes, e.dataTransfer.getData('text/plain'), ''));
-      }}
-    >
-      {tree(nodes)}
-      {nodes.length === 0 && <p className="panel-help">Sin componentes.</p>}
-    </div>
+    <>
+      <button className="root-select" onClick={() => actions.selectNode(ROOT)}>
+        Página · nivel raíz
+      </button>
+      <div className="tree">
+        {tree(nodes)}
+        {!nodes.length && <p className="panel-help">Sin componentes.</p>}
+      </div>
+    </>
   );
 }

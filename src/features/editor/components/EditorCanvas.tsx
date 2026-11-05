@@ -1,33 +1,47 @@
-import { useState } from 'react';
-import { Plus, Monitor, Smartphone } from 'lucide-react';
+import { useDragScroll } from '../hooks/useDragScroll';
+import { Frame, useEditor } from '@craftjs/core';
+import { useState, type ReactNode } from 'react';
+import { Monitor, Smartphone } from 'lucide-react';
 import type { ComponentNode } from '../../../models/contracts';
 import { RenderTree } from '../../../components/renderer';
-interface Props {
-  nodes: ComponentNode[];
-  name: string;
-  preview: boolean;
-  selected: string;
-  onSelect: (id: string) => void;
-  onAdd: (type: string) => void;
-}
+import { toCraft } from '../craft/adapter';
+
 export function EditorCanvas({
   nodes,
+  initialNodes,
   name,
   preview,
-  selected,
-  onSelect: setSelected,
-  onAdd: add,
-}: Props) {
+  selectionBar,
+}: {
+  nodes: ComponentNode[];
+  initialNodes: ComponentNode[];
+  name: string;
+  preview: boolean;
+  selectionBar?: ReactNode;
+}) {
+  const ref = useDragScroll();
+  const { dropTarget, invalid, before, where } = useEditor((state) => ({
+    dropTarget: state.indicator
+      ? state.indicator.placement.parent.id === 'ROOT'
+        ? 'la página'
+        : state.indicator.placement.parent.data.props.nodeType
+      : '',
+    invalid: !!state.indicator?.error,
+    before: state.indicator?.placement.currentNode?.data.props.nodeType ?? '',
+    where: state.indicator?.placement.where ?? '',
+  }));
   const [mobile, setMobile] = useState(false);
+  const [initialData] = useState(() => toCraft(initialNodes));
   return (
-    <main className="canvas-area">
+    <main className="canvas-area" ref={ref}>
       <div className="canvas-toolbar">
         <span>
-          {preview ? 'VISTA PREVIA DEL BORRADOR' : 'CANVAS'} <small> / {name}</small>
+          {preview ? 'Vista previa del borrador' : 'Lienzo'} <small> / {name}</small>
         </span>
         <div className="actions">
           <button
             aria-label="Vista escritorio"
+            aria-pressed={!mobile}
             className={!mobile ? 'active' : ''}
             onClick={() => setMobile(false)}
           >
@@ -35,6 +49,7 @@ export function EditorCanvas({
           </button>
           <button
             aria-label="Vista móvil"
+            aria-pressed={mobile}
             className={mobile ? 'active' : ''}
             onClick={() => setMobile(true)}
           >
@@ -42,57 +57,23 @@ export function EditorCanvas({
           </button>
         </div>
       </div>
+      {selectionBar}
+      {dropTarget && !preview && (
+        <div className={'drop-feedback ' + (invalid ? 'invalid' : '')} role="status">
+          {invalid
+            ? 'Este destino no admite el componente'
+            : `Soltar en ${dropTarget}${before ? ` · ${where === 'before' ? 'antes' : 'después'} de ${before}` : ' · al final'}`}
+        </div>
+      )}
       <div className={'canvas ' + (mobile ? 'mobile' : '')}>
-        <RenderTree
-          nodes={nodes}
-          decorate={
-            preview
-              ? undefined
-              : (n, view) => (
-                  <div
-                    className={'canvas-node ' + (n.id === selected ? 'selected' : '')}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={'Seleccionar ' + n.type}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelected(n.id);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelected(n.id);
-                      }
-                    }}
-                  >
-                    <span className="node-label">{n.type}</span>
-                    <div className="node-content">{view}</div>
-                  </div>
-                )
-          }
-        />
-        {!nodes.length && (
-          <div className="canvas-empty">
-            <div className="empty-icon">
-              <Plus size={28} />
-            </div>
-            <h2>Un lienzo, infinitas posibilidades</h2>
-            <p>
-              Selecciona un componente del panel izquierdo
-              <br />
-              para empezar a diseñar tu página.
-            </p>
-            <button onClick={() => add('Heading')} className="primary">
-              Agregar Heading
-            </button>
-          </div>
-        )}
+        <div hidden={preview}>
+          <Frame data={initialData} />
+        </div>
+        {preview && <RenderTree nodes={nodes} />}
       </div>
       <div className="canvas-foot">
         {mobile ? '375 px · Móvil' : 'Escritorio · Ancho adaptable'}
-        <span>Frontend Builder</span>
+        <span>{preview ? 'Borrador sin publicar' : 'Arrastra para insertar o mover'}</span>
       </div>
     </main>
   );

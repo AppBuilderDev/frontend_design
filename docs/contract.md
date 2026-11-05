@@ -17,3 +17,13 @@ GET /api/pages devuelve borradores administrativos. PUT con status=draft guarda 
 Extraer contratos, esquemas de validación, renderizador y pruebas de conformidad a un paquete privado `@frontend-builder/contracts` con SemVer, consumido por cada repositorio mediante una versión fijada. Añadir schemaVersion en la persistencia/respuestas antes de cambiar el formato, migraciones explícitas, matriz de compatibilidad y CI de conformidad. Mientras tanto, mantener estos archivos equivalentes y revisar cambios coordinadamente. El editor no forma parte del paquete compartido.
 
 No se implementa federación de módulos: Design y Runtime son aplicaciones desplegables independientes que comparten datos vía HTTP. Un futuro microfrontend de componentes puede registrarse en el bootstrap, con manifest y versiones verificadas.
+
+## Editor Craft.js
+
+Craft.js es una dependencia exclusiva de Design. El adaptador `src/features/editor/craft/adapter.ts` carga páginas v1 en el estado de Craft y exporta los nodos al mismo contrato v1 al guardar. Se conservan IDs, tipos desconocidos, propiedades y jerarquía. El nodo raíz de Craft y sus metadatos no se envían a la API. Las páginas existentes no requieren migración y Runtime sigue consumiendo el árbol público sin depender de Craft. Los nuevos destinos de anidamiento se limitan a Container/Card; se preservan árboles heredados con otros tipos de padres.
+
+## Controles visuales y bloques reutilizables
+
+El contrato v1 conserva su forma. Se añaden propiedades de espaciado por lado: paddingTop/Right/Bottom/Left y marginTop/Right/Bottom/Left. Los lados explícitos prevalecen sobre el espaciado general. Container y Card admiten display, flexDirection, flexWrap, alignItems, justifyContent, gap y gridTemplateColumns; se aplican al contenedor que contiene los hijos. Los valores CSS siguen filtrándose antes de renderizar. Design y Runtime mantienen renderizadores equivalentes.
+
+La biblioteca de bloques es administrativa y se guarda por separado de las páginas. Cada bloque tiene id, name, components y createdAt. Insertar, duplicar o pegar asigna IDs nuevos a toda la jerarquía; las páginas contienen copias completas sin referencias a la biblioteca. Eliminar un bloque de la biblioteca no modifica páginas publicadas. No hay cambios en la publicación ni dependencia de Craft en Runtime.

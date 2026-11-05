@@ -1,6 +1,7 @@
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApi } from './app.ts';
+import { JsonBlockRepository } from './blocksRepository.ts';
 import { JsonPageRepository } from './repository.ts';
 const file = process.env.PAGES_FILE
   ? resolve(process.env.PAGES_FILE)
@@ -13,6 +14,12 @@ const origins = (
   .map((v) => v.trim());
 const port = Number(process.env.API_PORT ?? 3001);
 const host = process.env.API_HOST ?? '127.0.0.1';
-createApi(new JsonPageRepository(file), origins).listen(port, host, () =>
-  console.log(`API de desarrollo: http://${host}:${port}`),
-);
+createApi(
+  new JsonPageRepository(file),
+  origins,
+  new JsonBlockRepository(
+    process.env.BLOCKS_FILE
+      ? resolve(process.env.BLOCKS_FILE)
+      : resolve(dirname(file), 'blocks.json'),
+  ),
+).listen(port, host, () => console.log(`API de desarrollo: http://${host}:${port}`));

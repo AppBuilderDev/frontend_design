@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Undo2, Redo2 } from 'lucide-react';
 import type { Page } from '../../../models/contracts';
 interface Props {
   page: Page;
@@ -8,8 +8,23 @@ interface Props {
   busy: boolean;
   onPreview: () => void;
   onSave: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
 }
-export function EditorToolbar({ page, dirty, preview, busy, onPreview, onSave: save }: Props) {
+export function EditorToolbar({
+  page,
+  dirty,
+  preview,
+  busy,
+  onPreview,
+  onSave: save,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+}: Props) {
   return (
     <header className="editor-toolbar">
       <div className="actions">
@@ -33,6 +48,26 @@ export function EditorToolbar({ page, dirty, preview, busy, onPreview, onSave: s
         </span>
       </div>
       <div className="actions">
+        {!preview && (
+          <>
+            <button
+              aria-label="Deshacer"
+              title="Deshacer (Ctrl/⌘ Z)"
+              disabled={!canUndo}
+              onClick={onUndo}
+            >
+              <Undo2 size={16} />
+            </button>
+            <button
+              aria-label="Rehacer"
+              title="Rehacer (Ctrl/⌘ Mayús Z)"
+              disabled={!canRedo}
+              onClick={onRedo}
+            >
+              <Redo2 size={16} />
+            </button>
+          </>
+        )}
         <button onClick={onPreview}>
           <Eye size={15} />
           {preview ? 'Editar' : 'Vista previa'}

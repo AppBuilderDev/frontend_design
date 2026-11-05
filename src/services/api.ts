@@ -1,3 +1,4 @@
+import { blockSchema, type SavedBlock } from '../models/blocks';
 import { pageSchema, type Page } from '../models/contracts';
 const base = (import.meta.env.VITE_API_URL ?? 'http://localhost:3001').replace(/\/$/, '');
 async function request(path: string, init?: RequestInit) {
@@ -30,3 +31,18 @@ export const runtimeUrl = (import.meta.env.VITE_RUNTIME_URL ?? 'http://localhost
   /\/$/,
   '',
 );
+
+export const blocksApi = {
+  list: async (): Promise<SavedBlock[]> => blockSchema.array().parse(await request('/api/blocks')),
+  save: async (name: string, components: SavedBlock['components']): Promise<SavedBlock> =>
+    blockSchema.parse(
+      await request('/api/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, components }),
+      }),
+    ),
+  remove: async (id: string) => {
+    await request('/api/blocks/' + id, { method: 'DELETE' });
+  },
+};

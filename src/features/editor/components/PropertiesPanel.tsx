@@ -1,29 +1,27 @@
+import { StyleControls } from './StyleControls';
 import { useState } from 'react';
 import { ChevronUp, ChevronDown, Trash2, Layers } from 'lucide-react';
 import type { ComponentNode } from '../../../models/contracts';
-import { moveNode, removeNode } from '../../../state/tree';
 interface Props {
   node?: ComponentNode;
-  nodes: ComponentNode[];
-  selected: string;
   containers: ComponentNode[];
   onProperty: (key: string, value: string) => void;
-  onChange: (nodes: ComponentNode[]) => void;
-  onSelect: (id: string) => void;
+  onReorder: (offset: number) => void;
+  onMove: (parent: string) => void;
+  onDelete: () => void;
 }
 export function PropertiesPanel({
   node,
-  nodes,
-  selected,
   containers,
   onProperty: prop,
-  onChange: change,
-  onSelect: setSelected,
+  onReorder,
+  onMove,
+  onDelete,
 }: Props) {
   const [destination, setDestination] = useState('');
   return (
     <aside className="editor-right">
-      <div className="panel-heading">PROPIEDADES</div>
+      <div className="panel-heading">Propiedades</div>
       {node ? (
         <div className="properties">
           <div className="selected-type">
@@ -100,57 +98,16 @@ export function PropertiesPanel({
               </label>
             </>
           )}
-          <div className="panel-heading">ESTILOS</div>
-          {[
-            ['color', 'Color de texto'],
-            ['backgroundColor', 'Color de fondo'],
-            ['fontSize', 'Tamaño de texto'],
-            ['padding', 'Espaciado interior'],
-            ['margin', 'Margen'],
-            ['borderRadius', 'Radio de borde'],
-            ['maxWidth', 'Ancho máximo'],
-          ].map(([key, label]) => (
-            <label key={key}>
-              {label}
-              <input
-                placeholder={key.includes('Color') || key === 'color' ? '#ffffff' : '24px'}
-                value={String(node.props[key] ?? '')}
-                onChange={(e) => prop(key, e.target.value)}
-              />
-            </label>
-          ))}
-          <label>
-            Alineación
-            <select
-              value={String(node.props.textAlign ?? 'left')}
-              onChange={(e) => prop('textAlign', e.target.value)}
-            >
-              {['left', 'center', 'right'].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </label>
-          <div className="panel-heading">ORGANIZAR</div>
+          <StyleControls node={node} onChange={prop} />
+          <div className="panel-heading">Organizar</div>
           <div className="actions">
-            <button
-              aria-label="Subir componente"
-              onClick={() => change(moveNode(nodes, selected, '', -1))}
-            >
+            <button aria-label="Subir componente" onClick={() => onReorder(-1)}>
               <ChevronUp size={17} />
             </button>
-            <button
-              aria-label="Bajar componente"
-              onClick={() => change(moveNode(nodes, selected, '', 1))}
-            >
+            <button aria-label="Bajar componente" onClick={() => onReorder(1)}>
               <ChevronDown size={17} />
             </button>
-            <button
-              aria-label="Eliminar componente"
-              onClick={() => {
-                change(removeNode(nodes, selected));
-                setSelected('');
-              }}
-            >
+            <button aria-label="Eliminar componente" onClick={onDelete}>
               <Trash2 size={17} />
             </button>
           </div>
@@ -165,11 +122,10 @@ export function PropertiesPanel({
               ))}
             </select>
           </label>
-          <button onClick={() => change(moveNode(nodes, selected, destination))}>
-            Mover componente
-          </button>
+          <button onClick={() => onMove(destination)}>Mover componente</button>
           <small>
-            Arrastra capas sobre Container o Card para anidar. Las flechas reordenan entre hermanos.
+            Arrastra desde el tirador del lienzo para mover. También puedes usar las flechas o
+            elegir un destino.
           </small>
         </div>
       ) : (

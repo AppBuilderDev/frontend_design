@@ -5,3 +5,5 @@ dist/
 server/data/*.json
 playwright-report/
 test-results/
+
+server/data/*.tmp

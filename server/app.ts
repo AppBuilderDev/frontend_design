@@ -1,3 +1,5 @@
+import { blockInputSchema } from '../src/models/blocks.ts';
+import type { BlockRepository } from './blocksRepository.ts';
 import { createServer, type IncomingMessage } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { pageInputSchema, validTree } from '../src/models/contracts.ts';
@@ -23,7 +25,7 @@ async function body(req: IncomingMessage) {
     throw new HttpError(400, 'JSON inválido');
   }
 }
-export function createApi(repository: PageRepository, origins: string[]) {
+export function createApi(repository: PageRepository, origins: string[], blocks: BlockRepository) {
   return createServer(async (req, res) => {
     const origin = req.headers.origin;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -49,6 +51,32 @@ export function createApi(repository: PageRepository, origins: string[]) {
       }
       const url = new URL(req.url ?? '/', 'http://localhost');
       const path = url.pathname;
+      if (path === '/api/blocks' && req.method === 'GET') {
+        send(200, await blocks.list());
+        return;
+      }
+      if (path === '/api/blocks' && req.method === 'POST') {
+        const parsed = blockInputSchema.safeParse(await body(req));
+        if (!parsed.success)
+          throw new HttpError(400, parsed.error.issues.map((i) => i.message).join('; '));
+        const block = { ...parsed.data, id: randomUUID(), createdAt: new Date().toISOString() };
+        await blocks.transact((items) => {
+          items.push(block);
+        });
+        send(201, block);
+        return;
+      }
+      const blockMatch = /^\/api\/blocks\/([^/]+)$/.exec(path);
+      if (blockMatch && req.method === 'DELETE') {
+        await blocks.transact((items) => {
+          const index = items.findIndex((item) => item.id === blockMatch[1]);
+          if (index < 0) throw new HttpError(404, 'Bloque no encontrado');
+          items.splice(index, 1);
+        });
+        res.writeHead(204);
+        res.end();
+        return;
+      }
       if (path === '/api/public/pages/by-path' && req.method === 'GET') {
         const value = url.searchParams.get('path');
         const page = (await repository.list()).find(

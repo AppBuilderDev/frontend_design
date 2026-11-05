@@ -1,3 +1,4 @@
+import { JsonBlockRepository } from '../server/blocksRepository';
 import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -12,7 +13,11 @@ async function setup() {
   const dir = await mkdtemp(join(tmpdir(), 'builder-'));
   const file = join(dir, 'pages.json');
   const repo = new JsonPageRepository(file);
-  const server = createApi(repo, ['http://localhost:5173']);
+  const server = createApi(
+    repo,
+    ['http://localhost:5173'],
+    new JsonBlockRepository(join(dir, 'blocks.json')),
+  );
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
   const address = server.address();
   if (!address || typeof address === 'string') throw Error('Sin puerto');
@@ -23,6 +28,7 @@ async function setup() {
   });
   return {
     file,
+    blocksFile: join(dir, 'blocks.json'),
     call: (path: string, method = 'GET', data?: unknown) =>
       fetch(base + path, {
         method,
@@ -128,4 +134,31 @@ describe('API HTTP y persistencia', () => {
     expect((await (await call('/api/pages')).json()).length).toBe(8);
     expect((await call('/api/public/pages/by-path?path=/reportes/ventas-1')).status).toBe(200);
   });
+});
+
+it('persiste bloques entre sesiones, valida árboles y permite eliminarlos sin cambiar páginas', async () => {
+  const { call, blocksFile } = await setup();
+  expect(
+    (await call('/api/blocks', 'POST', { name: '', components: draft.components })).status,
+  ).toBe(400);
+  expect(
+    (
+      await call('/api/blocks', 'POST', {
+        name: 'Duplicado',
+        components: [...draft.components, ...draft.components],
+      })
+    ).status,
+  ).toBe(400);
+  const created = await call('/api/blocks', 'POST', {
+    name: 'Mi sección',
+    components: draft.components,
+  });
+  expect(created.status).toBe(201);
+  const block = await created.json();
+  expect(await new JsonBlockRepository(blocksFile).list()).toEqual([block]);
+  expect(await (await call('/api/blocks')).json()).toEqual([block]);
+  expect(await (await call('/api/pages')).json()).toEqual([]);
+  expect((await call('/api/blocks/' + block.id, 'DELETE')).status).toBe(204);
+  expect((await call('/api/blocks/' + block.id, 'DELETE')).status).toBe(404);
+  expect(await new JsonBlockRepository(blocksFile).list()).toEqual([]);
 });

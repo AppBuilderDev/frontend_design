@@ -942,3 +942,391 @@ code {
     grid-column: 1/-1;
   }
 }
+
+/* Editor interactions: purple marks selection and valid insertion points. */
+.editor-shell .panel-heading {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+.editor-shell button:disabled {
+  cursor: not-allowed;
+}
+.catalog button {
+  position: relative;
+  cursor: grab;
+}
+.catalog button:active,
+.node-handle:active,
+.tree-row:active {
+  cursor: grabbing;
+}
+.catalog .catalog-grip {
+  position: absolute;
+  right: 6px;
+  top: 7px;
+  opacity: 0.6;
+}
+.panel-help {
+  color: #65728a;
+  font-size: 11px;
+}
+.craft-root {
+  min-height: 594px;
+  padding: 18px 0 40px;
+}
+.canvas-node {
+  margin-bottom: 12px;
+}
+.canvas-node.hovered {
+  border-color: #b8aff0;
+}
+.canvas-node > .node-handle {
+  display: inline-flex;
+  visibility: hidden;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  top: -24px;
+  padding: 3px 7px;
+  border: 0;
+  border-radius: 4px 4px 0 0;
+  cursor: grab;
+  white-space: nowrap;
+}
+.canvas-node.selected > .node-handle,
+.canvas-node.hovered > .node-handle,
+.canvas-node:focus-within > .node-handle {
+  visibility: visible;
+}
+.canvas-node.selected > .node-handle {
+  z-index: 4;
+}
+.canvas-node .node-handle:hover {
+  background: #5149ca;
+}
+.node-content .builder-container,
+.node-content .builder-card {
+  min-height: 112px;
+}
+.container-hint {
+  border: 1px dashed #b8aff0;
+  border-radius: 5px;
+  padding: 20px 12px;
+  text-align: center;
+  color: #7165b6;
+  font-size: 12px;
+  pointer-events: none;
+}
+.tree-row {
+  cursor: grab;
+}
+.canvas-toolbar {
+  letter-spacing: 0;
+  font-size: 12px;
+}
+.canvas-empty {
+  pointer-events: none;
+  min-height: 510px;
+}
+@media (max-width: 760px) {
+  .craft-root {
+    min-height: 394px;
+  }
+  .canvas-empty {
+    min-height: 340px;
+  }
+  .canvas {
+    padding: 18px;
+  }
+}
+
+/* Editing tools share the existing violet selection language. */
+.editor-right {
+  width: 304px;
+}
+.library-tabs {
+  display: flex;
+  padding: 14px 10px 12px;
+  gap: 4px;
+}
+.library-tabs button {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  padding: 9px 4px;
+  border: 0;
+}
+.library-tabs button[aria-selected='true'] {
+  background: #eeebff;
+  color: #5149ca;
+}
+.block-library .panel-heading {
+  padding-top: 12px;
+}
+.block-library .panel-help {
+  margin: 0;
+  padding-top: 0;
+}
+.block-row {
+  display: flex;
+  padding: 0 10px 8px;
+  gap: 3px;
+  align-items: center;
+}
+.block-insert {
+  min-width: 0;
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 12px 8px;
+}
+.block-insert > span {
+  flex: 1;
+  min-width: 0;
+}
+.block-insert strong {
+  font-size: 11px;
+  display: block;
+  overflow-wrap: anywhere;
+}
+.block-insert small {
+  font-size: 10px;
+  display: block;
+  font-weight: 400;
+  margin-top: 3px;
+}
+.block-insert > svg {
+  flex-shrink: 0;
+  color: #756acf;
+}
+.block-remove {
+  border: 0;
+  padding: 5px;
+  color: #9d2d26;
+}
+.library-error {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #9d2d26;
+}
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 auto 22px;
+  max-width: 1100px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #e1e5ee;
+  border-radius: 6px;
+}
+.selection-path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  min-width: 0;
+}
+.selection-path > span {
+  display: inline-flex;
+  align-items: center;
+  color: #748098;
+}
+.selection-path button {
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.selection-path button[aria-current] {
+  background: #f0effc;
+  color: #5149ca;
+}
+.selection-actions {
+  gap: 2px;
+}
+.selection-actions button:disabled {
+  cursor: not-allowed;
+}
+.canvas-node.drop-target,
+.craft-root.drop-target {
+  outline: 2px dashed #635bdf;
+  outline-offset: 5px;
+  background-color: #635bdf08;
+}
+.canvas-node.drop-invalid,
+.craft-root.drop-invalid {
+  outline-color: #c34444;
+  background-color: #c3444408;
+}
+.drop-feedback {
+  position: fixed;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  background: #5149ca;
+  color: white;
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 3px 14px #17243b26;
+  max-width: 80vw;
+}
+.drop-feedback.invalid {
+  background: #9d2d26;
+}
+.command-notice {
+  position: fixed;
+  bottom: 42px;
+  left: 18px;
+  z-index: 35;
+  background: #17243b;
+  color: white;
+  font-size: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  max-width: min(460px, 90vw);
+}
+.inspector-section {
+  border-top: 1px solid #e1e5ee;
+  padding-top: 12px;
+}
+.inspector-section > summary {
+  cursor: pointer;
+  color: #344159;
+  font-size: 12px;
+  font-weight: 650;
+  padding-bottom: 4px;
+}
+.inspector-fields {
+  display: grid;
+  gap: 14px;
+  padding: 12px 0 0;
+}
+.inspector-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.inspector-grid > * {
+  min-width: 0;
+}
+.unit-input {
+  display: flex;
+  border: 1px solid #d8deea;
+  border-radius: 7px;
+  overflow: hidden;
+  background: white;
+}
+.properties .unit-input input {
+  border: 0;
+  border-radius: 0;
+  min-width: 0;
+  padding: 8px 5px;
+}
+.properties .unit-input select {
+  border: 0;
+  border-left: 1px solid #e1e5ee;
+  border-radius: 0;
+  width: 54px;
+  flex-shrink: 0;
+  padding: 6px 2px;
+  font-size: 10px;
+}
+.color-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.properties .color-input input[type='color'] {
+  padding: 2px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.properties .color-input input[type='text'],
+.properties .color-input input:not([type]) {
+  min-width: 0;
+}
+.color-input button {
+  padding: 5px 7px;
+  border: 0;
+  font-size: 17px;
+}
+.spacing-control > details {
+  margin-top: 7px;
+}
+.spacing-control summary {
+  color: #65728a;
+  font-size: 10px;
+  cursor: pointer;
+}
+.spacing-control .inspector-grid {
+  margin-top: 12px;
+}
+.block-dialog {
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+}
+.block-dialog::backdrop {
+  background: #17243b70;
+}
+.block-dialog h2 {
+  font-size: 22px;
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .editor-right {
+    width: 280px;
+  }
+  .canvas-area {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .selection-actions {
+    margin-left: auto;
+  }
+}
+@media (max-width: 760px) {
+  .editor-right {
+    width: 100%;
+  }
+  .inspector-section {
+    grid-column: 1 / -1;
+  }
+  .library-tabs {
+    max-width: 360px;
+  }
+  .block-library {
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .selection-bar {
+    margin-bottom: 24px;
+  }
+  .properties > label,
+  .properties > .actions,
+  .properties > small {
+    grid-column: 1 / -1;
+  }
+}
+
+.canvas-node.selected > .node-handle {
+  display: inline-flex;
+}
+.field-control {
+  display: grid;
+  gap: 7px;
+}
+.properties .control-label {
+  font-size: 11px;
+  color: #65728a;
+  font-weight: 500;
+}

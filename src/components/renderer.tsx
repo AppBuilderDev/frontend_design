@@ -4,9 +4,13 @@ type ViewProps = { node: ComponentNode; children?: ReactNode };
 const str = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback);
 export const catalog = ['Container', 'Heading', 'Paragraph', 'Button', 'Input', 'Card'] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
-  Container: ({ children }) => <div className="builder-container">{children}</div>,
+  Container: ({ node, children }) => (
+    <div className="builder-container" style={layoutStyle(node.props)}>
+      {children}
+    </div>
+  ),
   Card: ({ node, children }) => (
-    <section className="builder-card">
+    <section className="builder-card" style={layoutStyle(node.props)}>
       <h3>{str(node.props.title, 'Tarjeta')}</h3>
       {children}
     </section>
@@ -63,12 +67,71 @@ function style(props: Record<string, unknown>): CSSProperties {
     'fontSize',
     'textAlign',
     'maxWidth',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+    'marginTop',
+    'marginRight',
+    'marginBottom',
+    'marginLeft',
   ] as const) {
     const value = props[key];
     if (typeof value === 'string' && !/url\s*\(|expression|[;{}]/i.test(value))
       Object.assign(s, { [key]: value });
   }
+  // Emit only longhands when a side is overridden. React otherwise overwrites
+  // unchanged sides when updating a conflicting padding/margin shorthand.
+  for (const prefix of ['padding', 'margin'] as const) {
+    const keys =
+      prefix === 'padding'
+        ? (['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'] as const)
+        : (['marginTop', 'marginRight', 'marginBottom', 'marginLeft'] as const);
+    if (!keys.some((key) => s[key])) continue;
+    const [top, right = top, bottom = top, left = right] = spacingParts(String(s[prefix] || '0px'));
+    delete s[prefix];
+    const values = [top, right, bottom, left];
+    keys.forEach((key, i) => Object.assign(s, { [key]: s[key] || values[i] }));
+  }
   return s;
+}
+function spacingParts(value: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let token = '';
+  for (const character of value.trim()) {
+    if (/\s/.test(character) && depth === 0) {
+      if (token) {
+        parts.push(token);
+        token = '';
+      }
+    } else {
+      token += character;
+      if (character === '(') depth++;
+      if (character === ')') depth--;
+    }
+  }
+  if (token) parts.push(token);
+  return parts;
+}
+function layoutStyle(props: Record<string, unknown>): CSSProperties {
+  const result: CSSProperties = {};
+  for (const key of [
+    'display',
+    'flexDirection',
+    'flexWrap',
+    'justifyContent',
+    'alignItems',
+    'gap',
+    'gridTemplateColumns',
+  ] as const) {
+    const value = props[key];
+    if (typeof value === 'string' && !/url\s*\(|expression|[;{}]/i.test(value))
+      Object.assign(result, { [key]: value });
+  }
+  if (props.display === 'grid' && !props.gridTemplateColumns)
+    result.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+  return result;
 }
 class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -83,6 +146,22 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
     );
   }
 }
+export function ComponentView({ node, children }: ViewProps) {
+  const View = Object.hasOwn(registry, node.type) ? registry[node.type] : undefined;
+  return (
+    <Boundary>
+      <div style={style(node.props)}>
+        {View ? (
+          <View node={node}>{children}</View>
+        ) : (
+          <div className="unknown" role="status">
+            Componente no disponible: {node.type}
+          </div>
+        )}
+      </div>
+    </Boundary>
+  );
+}
 export function RenderTree({
   nodes,
   decorate,
@@ -93,21 +172,10 @@ export function RenderTree({
   return (
     <>
       {nodes.map((node) => {
-        const View = Object.hasOwn(registry, node.type) ? registry[node.type] : undefined;
         const view = (
-          <Boundary key={node.id}>
-            <div style={style(node.props)}>
-              {View ? (
-                <View node={node}>
-                  <RenderTree nodes={node.children ?? []} decorate={decorate} />
-                </View>
-              ) : (
-                <div className="unknown" role="status">
-                  Componente no disponible: {node.type}
-                </div>
-              )}
-            </div>
-          </Boundary>
+          <ComponentView node={node}>
+            <RenderTree nodes={node.children ?? []} decorate={decorate} />
+          </ComponentView>
         );
         return <div key={node.id}>{decorate ? decorate(node, view) : view}</div>;
       })}

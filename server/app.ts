@@ -11,14 +11,17 @@ class HttpError extends Error {
   }
 }
 async function body(req: IncomingMessage) {
-  let text = '';
+  const chunks: Buffer[] = [];
+  let totalBytes = 0;
   for await (const chunk of req) {
-    text += chunk;
-    if (Buffer.byteLength(text) > 1_000_000)
+    const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as string);
+    totalBytes += buf.length;
+    if (totalBytes > 1_000_000)
       throw new HttpError(413, 'Definición demasiado grande');
+    chunks.push(buf);
   }
   try {
-    return JSON.parse(text);
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
   } catch {
     throw new HttpError(400, 'JSON inválido');
   }

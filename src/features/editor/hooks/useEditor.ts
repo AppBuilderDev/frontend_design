@@ -50,17 +50,22 @@ export function useEditor() {
     setDirty(true);
   }
   async function save() {
-    if (!page) return;
+    // Evitar múltiples guardados concurrentes
+    if (!page || busy) return;
     setBusy(true);
     setError('');
     const current = revision.current;
     try {
       const saved = await pagesApi.save({ ...page, status: 'published' }, page.id);
       if (revision.current === current) {
+        // No hubo cambios nuevos mientras guardaba: actualizamos estado y limpiamos dirty
         setPage(saved);
         setDirty(false);
+        setNotice('Cambios guardados y publicados. Ya están disponibles en Runtime.');
+      } else {
+        // Hubo cambios locales mientras guardaba: informamos sin marcar limpio
+        setNotice('Guardado. Tienes cambios locales pendientes adicionales.');
       }
-      setNotice('Cambios guardados y publicados. Ya están disponibles en Runtime.');
     } catch (e) {
       setError((e as Error).message);
     } finally {

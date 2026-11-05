@@ -67,7 +67,7 @@ export function PropertiesPanel({
             <label>
               Enlace
               <input
-                placeholder="/inicio o https://?"
+                placeholder="/inicio o https://..."
                 value={String(node.props.href ?? '')}
                 onChange={(e) => prop('href', e.target.value)}
               />

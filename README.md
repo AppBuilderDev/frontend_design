@@ -75,3 +75,9 @@ No hay monorepo, tercer repositorio, enlaces locales entre paquetes ni cambios d
 API de bloques administrativos: GET/POST `/api/blocks`, DELETE `/api/blocks/:id`. Se valida el árbol y se persiste en JSON con la misma cola de transacciones y reemplazo atómico usados para páginas. Se reintentan brevemente bloqueos temporales de archivos de Windows. Reiniciar `npm run api` tras actualizar el código del servidor.
 
 La propuesta para crear endpoints propios con datos está en [servicios de datos](docs/data-services.md).
+
+### Alineación y espaciado
+
+«Alineación del texto» permite heredar del contenedor o definir una alineación propia. Para posicionar componentes dentro de Container/Card, usar Distribución → Alineación horizontal/vertical; el inspector adapta cada eje a la dirección Flexbox o a la cuadrícula.
+
+El espaciado interior de Container y Card se aplica al elemento que contiene los hijos, sustituyendo su padding predeterminado de 24 px. Un valor de 0 elimina ese espacio. Las envolturas del editor no añaden padding ni márgenes a los componentes; la zona mínima para soltar se mantiene solo en contenedores vacíos.

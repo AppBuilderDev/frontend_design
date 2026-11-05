@@ -27,3 +27,9 @@ Craft.js es una dependencia exclusiva de Design. El adaptador `src/features/edit
 El contrato v1 conserva su forma. Se añaden propiedades de espaciado por lado: paddingTop/Right/Bottom/Left y marginTop/Right/Bottom/Left. Los lados explícitos prevalecen sobre el espaciado general. Container y Card admiten display, flexDirection, flexWrap, alignItems, justifyContent, gap y gridTemplateColumns; se aplican al contenedor que contiene los hijos. Los valores CSS siguen filtrándose antes de renderizar. Design y Runtime mantienen renderizadores equivalentes.
 
 La biblioteca de bloques es administrativa y se guarda por separado de las páginas. Cada bloque tiene id, name, components y createdAt. Insertar, duplicar o pegar asigna IDs nuevos a toda la jerarquía; las páginas contienen copias completas sin referencias a la biblioteca. Eliminar un bloque de la biblioteca no modifica páginas publicadas. No hay cambios en la publicación ni dependencia de Craft en Runtime.
+
+### Alineación y padding de contenedores
+
+`justifyItems` permite alinear horizontalmente los elementos de una cuadrícula. `textAlign` mantiene la semántica de texto heredable; una propiedad explícita en un hijo tiene prioridad sobre la heredada. La posición de componentes se configura mediante los ejes de distribución.
+
+En Container/Card, padding y sus valores por lado se aplican al contenedor real de los hijos, reemplazando el padding predeterminado. El margen sigue siendo externo. No se cambia el formato de los datos guardados.

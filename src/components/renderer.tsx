@@ -1,6 +1,13 @@
 import { Component, type ReactNode, type CSSProperties, type ComponentType } from 'react';
 import type { ComponentNode } from '../models/contracts';
 type ViewProps = { node: ComponentNode; children?: ReactNode };
+const paddingKeys = [
+  'padding',
+  'paddingTop',
+  'paddingRight',
+  'paddingBottom',
+  'paddingLeft',
+] as const;
 const str = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback);
 export const catalog = ['Container', 'Heading', 'Paragraph', 'Button', 'Input', 'Card'] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
@@ -56,7 +63,7 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
 export function registerComponent(type: string, component: ComponentType<ViewProps>) {
   registry[type] = component;
 }
-function style(props: Record<string, unknown>): CSSProperties {
+function style(props: Record<string, unknown>, includePadding = true): CSSProperties {
   const s: CSSProperties = {};
   for (const key of [
     'color',
@@ -93,6 +100,7 @@ function style(props: Record<string, unknown>): CSSProperties {
     const values = [top, right, bottom, left];
     keys.forEach((key, i) => Object.assign(s, { [key]: s[key] || values[i] }));
   }
+  if (!includePadding) paddingKeys.forEach((key) => delete s[key]);
   return s;
 }
 function spacingParts(value: string): string[] {
@@ -116,11 +124,16 @@ function spacingParts(value: string): string[] {
 }
 function layoutStyle(props: Record<string, unknown>): CSSProperties {
   const result: CSSProperties = {};
+  const appearance = style(props);
+  paddingKeys.forEach((key) => {
+    if (appearance[key] !== undefined) Object.assign(result, { [key]: appearance[key] });
+  });
   for (const key of [
     'display',
     'flexDirection',
     'flexWrap',
     'justifyContent',
+    'justifyItems',
     'alignItems',
     'gap',
     'gridTemplateColumns',
@@ -150,7 +163,7 @@ export function ComponentView({ node, children }: ViewProps) {
   const View = Object.hasOwn(registry, node.type) ? registry[node.type] : undefined;
   return (
     <Boundary>
-      <div style={style(node.props)}>
+      <div style={style(node.props, node.type !== 'Container' && node.type !== 'Card')}>
         {View ? (
           <View node={node}>{children}</View>
         ) : (

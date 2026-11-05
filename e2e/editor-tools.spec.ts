@@ -116,11 +116,8 @@ test('guarda bloques en el backend y los reutiliza en otra página con estilos p
       .click();
     await page.getByLabel('Espaciado interior · superior', { exact: true }).fill('8');
     await page.getByLabel('Espaciado interior', { exact: true }).fill('44');
-    await expect(container.locator('.builder-container').first().locator('..')).toHaveCSS(
-      'padding-top',
-      '8px',
-    );
-    await expect(container.locator('.builder-container').first().locator('..')).toHaveCSS(
+    await expect(container.locator('.builder-container').first()).toHaveCSS('padding-top', '8px');
+    await expect(container.locator('.builder-container').first()).toHaveCSS(
       'padding-right',
       '44px',
     );

@@ -131,6 +131,9 @@ function SpacingControl({
 }
 export function StyleControls({ node, onChange }: { node: ComponentNode; onChange: Change }) {
   const str = (key: string, fallback = '') => String(node.props[key] ?? fallback);
+  const display = str('display') || (node.type === 'Container' ? 'flex' : 'block');
+  const direction = str('flexDirection') || (node.type === 'Container' ? 'column' : 'row');
+  const horizontalFlow = direction.startsWith('row');
   const select = (key: string, label: string, options: [string, string][], fallback = '') => (
     <label>
       {label}
@@ -174,15 +177,16 @@ export function StyleControls({ node, onChange }: { node: ComponentNode; onChang
               onChange={(value) => onChange('borderRadius', value)}
             />
           </div>
-          {select(
-            'textAlign',
-            'Alineación',
-            [
-              ['left', 'Izquierda'],
-              ['center', 'Centro'],
-              ['right', 'Derecha'],
-            ],
-            'left',
+          {select('textAlign', 'Alineación del texto', [
+            ['', 'Heredar del contenedor'],
+            ['left', 'Izquierda'],
+            ['center', 'Centro'],
+            ['right', 'Derecha'],
+          ])}
+          {isContainer(node.type) && (
+            <small>
+              Este control alinea el texto. Para posicionar los componentes, usa Distribución.
+            </small>
           )}
         </div>
       </details>
@@ -213,7 +217,7 @@ export function StyleControls({ node, onChange }: { node: ComponentNode; onChang
               ['grid', 'Cuadrícula'],
               ['block', 'Bloques'],
             ])}
-            {(str('display') === 'flex' || (!str('display') && node.type === 'Container')) && (
+            {display === 'flex' && (
               <>
                 {select(
                   'flexDirection',
@@ -222,7 +226,7 @@ export function StyleControls({ node, onChange }: { node: ComponentNode; onChang
                     ['column', 'Vertical'],
                     ['row', 'Horizontal'],
                   ],
-                  'column',
+                  node.type === 'Container' ? 'column' : 'row',
                 )}
                 {select(
                   'flexWrap',
@@ -256,21 +260,52 @@ export function StyleControls({ node, onChange }: { node: ComponentNode; onChang
                 </select>
               </label>
             )}
-            {select('alignItems', 'Alinear elementos', [
-              ['', 'Predeterminado'],
-              ['stretch', 'Estirar'],
-              ['flex-start', 'Inicio'],
-              ['center', 'Centro'],
-              ['flex-end', 'Final'],
-            ])}
-            {select('justifyContent', 'Distribuir elementos', [
-              ['', 'Predeterminado'],
-              ['flex-start', 'Inicio'],
-              ['center', 'Centro'],
-              ['flex-end', 'Final'],
-              ['space-between', 'Espacio entre elementos'],
-              ['space-around', 'Espacio alrededor'],
-            ])}
+            {(display === 'flex' || display === 'grid') && (
+              <>
+                {select(
+                  'alignItems',
+                  display === 'grid' || horizontalFlow
+                    ? 'Alineación vertical'
+                    : 'Alineación horizontal',
+                  [
+                    ['', 'Predeterminado'],
+                    ['stretch', 'Estirar'],
+                    ['flex-start', 'Inicio'],
+                    ['center', 'Centro'],
+                    ['flex-end', 'Final'],
+                  ],
+                )}
+                {display === 'grid'
+                  ? select('justifyItems', 'Alineación horizontal', [
+                      ['', 'Predeterminado'],
+                      ['stretch', 'Estirar'],
+                      ['start', 'Inicio'],
+                      ['center', 'Centro'],
+                      ['end', 'Final'],
+                    ])
+                  : select(
+                      'justifyContent',
+                      horizontalFlow ? 'Alineación horizontal' : 'Alineación vertical',
+                      [
+                        ['', 'Predeterminado'],
+                        ['flex-start', 'Inicio'],
+                        ['center', 'Centro'],
+                        ['flex-end', 'Final'],
+                        ['space-between', 'Espacio entre elementos'],
+                        ['space-around', 'Espacio alrededor'],
+                      ],
+                    )}
+                {display === 'grid' &&
+                  select('justifyContent', 'Distribución de la cuadrícula', [
+                    ['', 'Predeterminado'],
+                    ['flex-start', 'Inicio'],
+                    ['center', 'Centro'],
+                    ['flex-end', 'Final'],
+                    ['space-between', 'Espacio entre elementos'],
+                    ['space-around', 'Espacio alrededor'],
+                  ])}
+              </>
+            )}
             <LengthControl
               label="Separación"
               value={str('gap')}

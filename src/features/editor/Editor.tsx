@@ -34,7 +34,7 @@ export function Editor() {
             <button onClick={session.load}>Reintentar</button>
           </>
         ) : (
-          <p role="status">Cargando editor…</p>
+          <p role="status">Cargando editor...</p>
         )}
         <Link to="/">Volver a páginas</Link>
       </main>

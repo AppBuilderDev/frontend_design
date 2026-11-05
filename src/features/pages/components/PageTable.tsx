@@ -30,7 +30,7 @@ export function PageTable({
           <Search size={17} />
           <input
             aria-label="Buscar páginas"
-            placeholder="Buscar por nombre o código?"
+            placeholder="Buscar por nombre o código..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -38,7 +38,7 @@ export function PageTable({
       </div>
       {loading ? (
         <div className="empty" role="status">
-          Cargando páginas?
+          Cargando páginas...
         </div>
       ) : (
         <>

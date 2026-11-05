@@ -36,7 +36,7 @@ export function EditorCanvas({
     <main className="canvas-area" ref={ref}>
       <div className="canvas-toolbar">
         <span>
-          {preview ? 'Vista previa del borrador' : 'Lienzo'} <small> / {name}</small>
+          {preview ? 'Vista previa del borrador' : 'Lienzo'} <small>/ {name}</small>
         </span>
         <div className="actions">
           <button

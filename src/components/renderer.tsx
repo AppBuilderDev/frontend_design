@@ -48,7 +48,7 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
             ? str(node.props.inputType)
             : 'text'
         }
-        placeholder={str(node.props.placeholder, 'Escribe aquí?')}
+        placeholder={str(node.props.placeholder, 'Escribe aquí...')}
       />
     </label>
   ),

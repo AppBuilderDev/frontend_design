@@ -5,7 +5,7 @@ export const defaults: Record<string, Record<string, unknown>> = {
   Button: { text: 'Comenzar', href: '#' },
   Input: {
     label: 'Tu nombre',
-    placeholder: 'Escribe aquí?',
+    placeholder: 'Escribe aquí...',
     inputType: 'text',
   },
   Card: { title: 'Una nueva tarjeta' },

@@ -59,8 +59,13 @@ export function useEditor() {
       const saved = await pagesApi.save({ ...page, components, status: 'published' }, page.id);
       savedComponents.current = signature;
       setPage((p) => (p ? { ...saved, components: p.components } : saved));
-      setDirty(currentComponents.current !== signature);
-      setNotice('Cambios guardados y publicados. Ya están disponibles en Runtime.');
+      const hasPendingChanges = currentComponents.current !== signature;
+      setDirty(hasPendingChanges);
+      setNotice(
+        hasPendingChanges
+          ? 'Guardado. Tienes cambios locales pendientes adicionales.'
+          : 'Cambios guardados y publicados. Ya están disponibles en Runtime.',
+      );
     } catch (e) {
       setError((e as Error).message);
     } finally {

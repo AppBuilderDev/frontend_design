@@ -1,3 +1,4 @@
+import { getProjectScope } from '../../../services/projectScope';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Save, Eye, Undo2, Redo2 } from 'lucide-react';
 import type { Page } from '../../../models/contracts';
@@ -8,6 +9,7 @@ interface Props {
   busy: boolean;
   onPreview: () => void;
   onSave: () => void;
+  onPublish?: () => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
@@ -20,17 +22,20 @@ export function EditorToolbar({
   busy,
   onPreview,
   onSave: save,
+  onPublish,
   canUndo,
   canRedo,
   onUndo,
   onRedo,
 }: Props) {
+  const scope = getProjectScope();
+  const readOnly = scope?.role === 'reader';
   return (
     <header className="editor-toolbar">
       <div className="actions">
         <Link
           aria-label="Volver a páginas"
-          to="/"
+          to={scope ? '/workspace/pages' : '/'}
           onClick={(e) => {
             if (dirty && !window.confirm('Hay cambios sin guardar. ¿Salir del editor?'))
               e.preventDefault();
@@ -68,19 +73,29 @@ export function EditorToolbar({
             </button>
           </>
         )}
-        <button onClick={onPreview}>
+        <button disabled={readOnly} onClick={onPreview}>
           <Eye size={15} />
           {preview ? 'Editar' : 'Vista previa'}
         </button>
         <button
           className="primary"
-          disabled={busy}
-          title="Guarda los cambios y los hace públicos en Runtime"
+          disabled={busy || readOnly}
+          title={
+            scope
+              ? 'Conserva el borrador sin cambiar Runtime'
+              : 'Guarda los cambios y los hace públicos en Runtime'
+          }
           onClick={() => void save()}
         >
           <Save size={15} />
           {busy ? 'Guardando…' : 'Guardar'}
         </button>
+        {scope?.role === 'owner' && (
+          <button className="primary" disabled={busy} onClick={onPublish}>
+            Publicar
+          </button>
+        )}
+        {scope && scope.role !== 'owner' && <small>Solo el propietario publica</small>}
       </div>
     </header>
   );

@@ -1,3 +1,6 @@
+import { DataProvider } from '../../components/dataComponents';
+import { getProjectScope } from '../../services/projectScope';
+import { useEntities } from '../workspace/useEntities';
 import { Editor as CraftEditor } from '@craftjs/core';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -23,6 +26,8 @@ type Session = ReturnType<typeof useEditor>;
 
 export function Editor() {
   const session = useEditor();
+  const scope = getProjectScope();
+  const { entities } = useEntities(scope?.id);
   if (!session.page)
     return (
       <main className="screen-message">
@@ -47,7 +52,18 @@ export function Editor() {
       indicator={{ success: '#635bdf', error: '#c34444', thickness: 3 }}
       onNodesChange={(query) => session.change(fromCraft(query.getSerializedNodes()))}
     >
-      <Workspace session={session} page={session.page} />
+      {scope ? (
+        <DataProvider
+          projectId={scope.id}
+          entities={entities}
+          canWrite={scope.role !== 'reader'}
+          preview
+        >
+          <Workspace session={session} page={session.page} />
+        </DataProvider>
+      ) : (
+        <Workspace session={session} page={session.page} />
+      )}
     </CraftEditor>
   );
 }
@@ -86,6 +102,7 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
         busy={busy}
         onPreview={() => session.setPreview(!preview)}
         onSave={() => void session.save(nodes)}
+        onPublish={() => void session.save(nodes, true)}
         canUndo={canUndo}
         canRedo={canRedo}
         onUndo={() => commands.history('undo')}
@@ -211,7 +228,13 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
       <footer className="editor-status">
         <span className="dev-dot" />
         {dirty ? 'Cambios pendientes' : 'Todos los cambios guardados'}
-        <a href={runtimeUrl + '/' + page.code} target="_blank" rel="noreferrer">
+        <a
+          href={
+            runtimeUrl + (getProjectScope() ? '/p/' + getProjectScope()!.id : '') + '/' + page.code
+          }
+          target="_blank"
+          rel="noreferrer"
+        >
           Abrir Runtime ↗
         </a>
       </footer>

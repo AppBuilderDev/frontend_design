@@ -1,3 +1,4 @@
+import { useDataContext } from '../../../components/dataComponents';
 import { StyleControls } from './StyleControls';
 import { useState } from 'react';
 import { ChevronUp, ChevronDown, Trash2, Layers } from 'lucide-react';
@@ -19,6 +20,7 @@ export function PropertiesPanel({
   onDelete,
 }: Props) {
   const [destination, setDestination] = useState('');
+  const data = useDataContext();
   return (
     <aside className="editor-right">
       <div className="panel-heading">Propiedades</div>
@@ -96,6 +98,50 @@ export function PropertiesPanel({
                   ))}
                 </select>
               </label>
+            </>
+          )}
+          {['DataForm', 'DataTable', 'DataDetail'].includes(node.type) && (
+            <>
+              <div className="panel-heading">Conexión de datos</div>
+              <label>
+                Entidad
+                <select
+                  aria-label="Entidad conectada"
+                  value={String(node.props.entityId ?? '')}
+                  onChange={(e) => prop('entityId', e.target.value)}
+                >
+                  <option value="">Seleccionar entidad</option>
+                  {data?.entities.map((entity) => (
+                    <option key={entity.id} value={entity.id}>
+                      {entity.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Título
+                <input
+                  value={String(node.props.title ?? '')}
+                  onChange={(e) => prop('title', e.target.value)}
+                />
+              </label>
+              {node.type === 'DataForm' && (
+                <label>
+                  Operación
+                  <select
+                    aria-label="Operación del formulario"
+                    value={String(node.props.action ?? 'create')}
+                    onChange={(e) => prop('action', e.target.value)}
+                  >
+                    <option value="create">Crear registro</option>
+                    <option value="update">Editar selección del listado</option>
+                  </select>
+                </label>
+              )}
+              <small>
+                El servicio se resuelve por la entidad de este proyecto. En el editor no se
+                modifican registros.
+              </small>
             </>
           )}
           <StyleControls node={node} onChange={prop} />

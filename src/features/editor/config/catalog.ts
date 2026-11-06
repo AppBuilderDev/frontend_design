@@ -1,4 +1,7 @@
 export const defaults: Record<string, Record<string, unknown>> = {
+  DataForm: { entityId: '', action: 'create' },
+  DataTable: { entityId: '' },
+  DataDetail: { entityId: '' },
   Container: { padding: '24px' },
   Heading: { text: 'Un gran título', level: 'h1' },
   Paragraph: { text: 'Comparte tu historia con el mundo.' },

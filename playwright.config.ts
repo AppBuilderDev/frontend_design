@@ -6,11 +6,13 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run api',
+      env: { ENABLE_LEGACY_API: '1' },
       url: 'http://127.0.0.1:3001/api/pages',
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'npm run dev',
+      env: { VITE_LEGACY_UI: '1' },
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: !process.env.CI,
     },

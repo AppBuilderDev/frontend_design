@@ -1,3 +1,4 @@
+import { DataForm, DataTable, DataDetail, useDataContext } from './dataComponents';
 import { Component, type ReactNode, type CSSProperties, type ComponentType } from 'react';
 import type { ComponentNode } from '../models/contracts';
 type ViewProps = { node: ComponentNode; children?: ReactNode };
@@ -9,8 +10,21 @@ const paddingKeys = [
   'paddingLeft',
 ] as const;
 const str = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback);
-export const catalog = ['Container', 'Heading', 'Paragraph', 'Button', 'Input', 'Card'] as const;
+export const catalog = [
+  'Container',
+  'Heading',
+  'Paragraph',
+  'Button',
+  'Input',
+  'Card',
+  'DataForm',
+  'DataTable',
+  'DataDetail',
+] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
+  DataForm,
+  DataTable,
+  DataDetail,
   Container: ({ node, children }) => (
     <div className="builder-container" style={layoutStyle(node.props)}>
       {children}
@@ -34,7 +48,10 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
   },
   Paragraph: ({ node }) => <p>{str(node.props.text, 'Escribe aquí tu contenido.')}</p>,
   Button: ({ node }) => {
-    const href = str(node.props.href);
+    const context = useDataContext();
+    const original = str(node.props.href);
+    const href =
+      context && /^\/(?!\/)/.test(original) ? '/p/' + context.projectId + original : original;
     const safe = /^(https?:\/\/|\/(?!\/)|#)/.test(href);
     return safe ? (
       <a className="builder-button" href={href}>

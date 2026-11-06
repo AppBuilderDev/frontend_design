@@ -1,3 +1,4 @@
+import type { createPlatform } from './platform/http.ts';
 import { blockInputSchema } from '../src/models/blocks.ts';
 import type { BlockRepository } from './blocksRepository.ts';
 import { createServer, type IncomingMessage } from 'node:http';
@@ -27,20 +28,28 @@ async function body(req: IncomingMessage) {
     throw new HttpError(400, 'JSON inválido');
   }
 }
-export function createApi(repository: PageRepository, origins: string[], blocks: BlockRepository) {
+export function createApi(
+  repository: PageRepository,
+  origins: string[],
+  blocks: BlockRepository,
+  platform?: ReturnType<typeof createPlatform>,
+  legacyEnabled = true,
+) {
   return createServer(async (req, res) => {
     const origin = req.headers.origin;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Vary', 'Origin');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     if (origin && !origins.includes(origin)) {
       res.writeHead(403);
       res.end(JSON.stringify({ message: 'Origen no permitido' }));
       return;
     }
     if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
     const send = (status: number, data: unknown) => {
       res.writeHead(status);
       res.end(JSON.stringify(data));
@@ -53,6 +62,9 @@ export function createApi(repository: PageRepository, origins: string[], blocks:
       }
       const url = new URL(req.url ?? '/', 'http://localhost');
       const path = url.pathname;
+      if (platform && (await platform(req, res, url, () => body(req)))) return;
+      if (!legacyEnabled)
+        throw new HttpError(404, 'La API anterior está deshabilitada. Usa /api/v1.');
       if (path === '/api/blocks' && req.method === 'GET') {
         send(200, await blocks.list());
         return;

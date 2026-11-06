@@ -1,3 +1,4 @@
+import { getProjectScope } from '../../../services/projectScope';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ComponentNode, Page } from '../../../models/contracts';
@@ -10,7 +11,7 @@ export function useEditor() {
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [preview, setPreview] = useState(getProjectScope()?.role === 'reader');
   const savedComponents = useRef('');
   const currentComponents = useRef('');
   const load = useCallback(() => {
@@ -50,13 +51,19 @@ export function useEditor() {
     setPage((p) => (p ? { ...p, components } : p));
     setDirty(signature !== savedComponents.current);
   }, []);
-  async function save(components: ComponentNode[]) {
+  async function save(components: ComponentNode[], publish = false) {
+    const scope = getProjectScope();
+    if (scope?.role === 'reader' || (publish && scope && scope.role !== 'owner')) {
+      setError('No tienes permiso para guardar o publicar esta página');
+      return;
+    }
     if (!page || busy) return;
     setBusy(true);
     setError('');
     const signature = JSON.stringify(components);
     try {
-      const saved = await pagesApi.save({ ...page, components, status: 'published' }, page.id);
+      const status = !scope || publish ? 'published' : 'draft';
+      const saved = await pagesApi.save({ ...page, components, status }, page.id);
       savedComponents.current = signature;
       setPage((p) => (p ? { ...saved, components: p.components } : saved));
       const hasPendingChanges = currentComponents.current !== signature;
@@ -64,7 +71,9 @@ export function useEditor() {
       setNotice(
         hasPendingChanges
           ? 'Guardado. Tienes cambios locales pendientes adicionales.'
-          : 'Cambios guardados y publicados. Ya están disponibles en Runtime.',
+          : status === 'published'
+            ? 'Cambios guardados y publicados. Ya están disponibles en Runtime.'
+            : 'Borrador guardado. La versión publicada no ha cambiado.',
       );
     } catch (e) {
       setError((e as Error).message);

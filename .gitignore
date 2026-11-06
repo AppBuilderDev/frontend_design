@@ -7,3 +7,6 @@ playwright-report/
 test-results/
 
 server/data/*.tmp
+
+server/data/*.sqlite*
+server/data/backups/

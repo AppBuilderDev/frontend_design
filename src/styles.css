@@ -1332,3 +1332,703 @@ code {
   color: #65728a;
   font-weight: 500;
 }
+
+/* Shared connected components render identically in Design and Runtime. */
+.data-panel {
+  border: 1px solid #dbe1ea;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  color: #17243b;
+  min-width: 0;
+  margin-bottom: 16px;
+  text-align: left;
+}
+.data-panel h3 {
+  margin: 0 0 16px;
+}
+.data-panel form {
+  display: grid;
+  gap: 14px;
+}
+.data-field {
+  display: grid;
+  gap: 6px;
+}
+.data-field input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+}
+.data-error {
+  color: #9d2d26;
+}
+.data-success {
+  color: #237650;
+}
+.data-hint,
+.data-empty {
+  font-size: 13px;
+  color: #65728a;
+}
+.data-empty {
+  padding: 14px 0;
+}
+.data-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.data-filters input {
+  flex: 1;
+  min-width: 160px;
+}
+.data-filters select {
+  max-width: 210px;
+}
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table th,
+.data-table td {
+  padding: 10px;
+  text-align: left;
+  font-size: 12px;
+  border-bottom: 1px solid #e1e5ee;
+  white-space: normal;
+}
+.data-table th {
+  background: #f5f7fb;
+}
+.data-table .actions button {
+  white-space: nowrap;
+  font-size: 11px;
+  padding: 6px 8px;
+}
+.data-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.data-pagination span {
+  margin-right: auto;
+}
+.data-detail {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.data-detail dt {
+  color: #65728a;
+  font-size: 12px;
+}
+.data-detail dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.data-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.data-workbench-actions {
+  margin-bottom: 12px;
+}
+@media (max-width: 1000px) {
+  .data-workbench {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Organization workspace */
+.workspace-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #17243b;
+}
+.workspace-nav {
+  background: #fff;
+  border-right: 1px solid #dbe1ea;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.workspace-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 750;
+  color: #6253dc;
+  text-decoration: none;
+  font-size: 18px;
+}
+.workspace-org {
+  font-size: 13px;
+  color: #60708a;
+}
+.project-switch {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: #60708a;
+}
+.project-switch select {
+  width: 100%;
+}
+.workspace-nav nav {
+  display: grid;
+  gap: 8px;
+}
+.workspace-nav nav a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 9px;
+  text-decoration: none;
+  color: #52617b;
+  font-size: 14px;
+}
+.workspace-nav nav a.active {
+  background: #efedff;
+  color: #6253dc;
+  font-weight: 600;
+}
+.workspace-account {
+  margin-top: auto;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+.workspace-account small {
+  color: #60708a;
+}
+.workspace-account button {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.workspace-main {
+  min-width: 0;
+}
+.workspace-header {
+  height: 72px;
+  border-bottom: 1px solid #dbe1ea;
+  background: white;
+  padding: 24px 36px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.workspace-header small {
+  color: #738098;
+}
+.workspace-content {
+  padding: 32px 36px;
+  max-width: 1500px;
+  margin: auto;
+}
+.workspace-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.workspace-heading h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  letter-spacing: -0.6px;
+}
+.workspace-heading p,
+.workspace-section p,
+.entity-dialog > p {
+  color: #60708a;
+  line-height: 1.6;
+  margin: 0;
+}
+.workspace-heading > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.workspace-section,
+.service-card,
+.service-response,
+.workspace-empty {
+  padding: 24px;
+  background: white;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.workspace-empty {
+  text-align: center;
+  padding: 64px 24px;
+  color: #60708a;
+}
+.workspace-empty h2 {
+  color: #17243b;
+}
+.workspace-section h2,
+.service-card h2 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+.workspace-section p {
+  margin-bottom: 20px;
+}
+.workspace-content input,
+.workspace-content select,
+.workspace-content textarea,
+.auth-form input,
+.auth-card input {
+  border: 1px solid #ccd5e2;
+  border-radius: 7px;
+  background: #fff;
+  padding: 10px 12px;
+  color: #17243b;
+  min-width: 0;
+  font: inherit;
+}
+.workspace-content label {
+  font-size: 13px;
+}
+.workspace-content button {
+  font: inherit;
+  border: 1px solid #dbe1ea;
+  border-radius: 7px;
+  padding: 9px 12px;
+  background: white;
+  color: #32435f;
+  cursor: pointer;
+}
+.workspace-content button.primary,
+.auth-form button.primary,
+.auth-card button.primary {
+  background: #6253dc;
+  color: white;
+  border-color: #6253dc;
+}
+.workspace-content button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.workspace-content button.danger {
+  color: #b33041;
+}
+.workspace-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.workspace-content th,
+.workspace-content td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e8ecf3;
+}
+.workspace-content th {
+  color: #60708a;
+  background: #f7f9fc;
+  font-weight: 500;
+}
+.workspace-text-link {
+  color: #6253dc;
+}
+.entity-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 24px 0 16px;
+}
+.entity-strip button.active {
+  background: #efedff;
+  color: #6253dc;
+  border-color: #c7bfff;
+}
+.entity-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  color: #60708a;
+  font-size: 13px;
+}
+.entity-caption button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.entity-dialog {
+  width: min(980px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+}
+.entity-dialog form {
+  display: grid;
+  gap: 20px;
+  margin-top: 24px;
+}
+.entity-dialog label {
+  display: grid;
+  gap: 7px;
+}
+.entity-fields {
+  display: grid;
+  gap: 16px;
+}
+.entity-fields fieldset {
+  border: 1px solid #dbe1ea;
+  border-radius: 9px;
+  padding: 18px;
+}
+.entity-fields legend {
+  color: #60708a;
+  font-size: 12px;
+}
+.entity-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+.entity-field-rules {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.entity-field-rules label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.entity-field-rules input[type='number'] {
+  width: 110px;
+}
+.entity-field-rules small {
+  color: #60708a;
+}
+.inline-form {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+.inline-form label {
+  display: grid;
+  gap: 8px;
+}
+.invitation-link {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0;
+}
+.invitation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #e8ecf3;
+}
+.archive-project {
+  margin-top: 28px;
+}
+.archive-project summary {
+  color: #b33041;
+  cursor: pointer;
+}
+.archive-project p {
+  margin-top: 16px;
+}
+.service-card {
+  display: grid;
+  gap: 18px;
+}
+.service-card small {
+  color: #738098;
+  overflow-wrap: anywhere;
+}
+.service-operations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.service-operations span {
+  font-size: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #f5f7fb;
+  padding: 8px;
+  border-radius: 6px;
+}
+.service-operations code {
+  font-size: 11px;
+  color: #6253dc;
+  font-weight: 700;
+}
+.service-card details {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.service-card pre,
+.service-response pre {
+  max-height: 350px;
+  overflow: auto;
+  padding: 16px;
+  background: #f5f7fb;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.service-card > button {
+  justify-self: start;
+}
+.service-card summary {
+  cursor: pointer;
+}
+.data-relation-filter {
+  display: flex;
+  gap: 6px;
+}
+.workspace-auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  background: #fff;
+  color: #17243b;
+}
+.auth-story {
+  padding: clamp(36px, 7vw, 110px);
+  background: #f0edff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.auth-brand {
+  font-weight: 750;
+  color: #6253dc;
+  margin-bottom: 60px;
+}
+.auth-story h1 {
+  font-size: clamp(32px, 3.7vw, 54px);
+  line-height: 1.1;
+  letter-spacing: -1.8px;
+  margin: 0 0 24px;
+  max-width: 550px;
+}
+.auth-story p {
+  color: #57647e;
+  line-height: 1.7;
+  max-width: 460px;
+}
+.auth-sample {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d5cef7;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 36px;
+  background: #ffffff80;
+}
+.auth-sample span {
+  font-size: 14px;
+  color: #6253dc;
+}
+.auth-sample small {
+  line-height: 1.6;
+  color: #738098;
+}
+.auth-form {
+  padding: clamp(28px, 6vw, 100px);
+  align-self: center;
+  max-width: 620px;
+  width: 100%;
+  margin: auto;
+}
+.auth-form h2 {
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  margin: 0 0 12px;
+}
+.auth-form > p {
+  color: #60708a;
+  line-height: 1.6;
+}
+.auth-form form,
+.auth-card form {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+.auth-form label,
+.auth-card label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+.auth-form form > small {
+  color: #738098;
+  line-height: 1.5;
+}
+.auth-form button,
+.auth-card button {
+  border-radius: 7px;
+  padding: 12px;
+  border: 1px solid #dbe1ea;
+  cursor: pointer;
+  font: inherit;
+}
+.auth-form .auth-toggle {
+  background: white;
+  color: #6253dc;
+  border: 0;
+  padding-left: 0;
+  margin-top: 16px;
+}
+.auth-screen {
+  min-height: 100vh;
+  background: #f5f7fb;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.auth-card {
+  width: min(420px, 100%);
+  padding: 36px;
+  background: white;
+  border: 1px solid #dbe1ea;
+  border-radius: 14px;
+}
+.auth-card h1 {
+  font-size: 26px;
+}
+.auth-card > p {
+  color: #60708a;
+  line-height: 1.6;
+}
+.auth-card > small {
+  color: #6253dc;
+  font-weight: 700;
+}
+.runtime-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 18px 28px;
+  border-bottom: 1px solid #dbe1ea;
+  background: white;
+}
+.runtime-header nav {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.runtime-header a {
+  color: #6253dc;
+  text-decoration: none;
+  font-size: 14px;
+}
+.runtime-header a[aria-current='page'] {
+  text-decoration: underline;
+}
+.runtime-header > span {
+  font-size: 13px;
+  color: #60708a;
+}
+@media (max-width: 900px) {
+  .workspace-shell {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+  .workspace-nav {
+    padding: 20px 12px;
+  }
+  .workspace-brand {
+    font-size: 15px;
+  }
+  .workspace-content {
+    padding: 24px 18px;
+  }
+  .workspace-header {
+    padding: 24px 18px;
+  }
+  .workspace-header small {
+    display: none;
+  }
+  .workspace-auth {
+    grid-template-columns: 1fr;
+  }
+  .auth-story {
+    padding: 40px;
+  }
+  .auth-brand {
+    margin-bottom: 24px;
+  }
+  .auth-sample {
+    display: none;
+  }
+  .auth-form {
+    padding: 40px;
+  }
+  .entity-field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .workspace-shell {
+    grid-template-columns: 1fr;
+  }
+  .workspace-nav {
+    gap: 12px;
+    border-bottom: 1px solid #dbe1ea;
+  }
+  .workspace-nav nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .workspace-nav nav a {
+    padding: 8px;
+  }
+  .workspace-org,
+  .project-switch,
+  .workspace-account small {
+    display: none;
+  }
+  .workspace-account {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .workspace-account button {
+    margin: 0;
+  }
+  .workspace-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .entity-field-row {
+    grid-template-columns: 1fr;
+  }
+  .entity-caption {
+    gap: 12px;
+  }
+  .auth-story h1 {
+    font-size: 34px;
+  }
+}

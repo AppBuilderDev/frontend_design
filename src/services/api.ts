@@ -1,7 +1,11 @@
+import { getProjectScope } from './projectScope';
+import { platformRequest } from './platformHttp';
 import { blockSchema, type SavedBlock } from '../models/blocks';
 import { pageSchema, type Page } from '../models/contracts';
 const base = (import.meta.env.VITE_API_URL ?? 'http://localhost:3001').replace(/\/$/, '');
 async function request(path: string, init?: RequestInit) {
+  const project = getProjectScope();
+  if (project) return platformRequest('/projects/' + project.id + path.replace(/^\/api/, ''), init);
   const response = await fetch(base + path, init);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Error de conexión' }));
@@ -13,7 +17,7 @@ export const pagesApi = {
   list: async (): Promise<Page[]> => pageSchema.array().parse(await request('/api/pages')),
   get: async (id: string): Promise<Page> => pageSchema.parse(await request('/api/pages/' + id)),
   save: async (
-    page: Pick<Page, 'name' | 'code' | 'components' | 'status'>,
+    page: Pick<Page, 'name' | 'code' | 'components' | 'status'> & { revision?: number },
     id?: string,
   ): Promise<Page> =>
     pageSchema.parse(
@@ -23,8 +27,10 @@ export const pagesApi = {
         body: JSON.stringify(page),
       }),
     ),
-  remove: async (id: string) => {
-    await request('/api/pages/' + id, { method: 'DELETE' });
+  remove: async (id: string, revision?: number) => {
+    await request('/api/pages/' + id + (getProjectScope() ? '?revision=' + revision : ''), {
+      method: 'DELETE',
+    });
   },
 };
 export const runtimeUrl = (import.meta.env.VITE_RUNTIME_URL ?? 'http://localhost:5174').replace(

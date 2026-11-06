@@ -1,7 +1,9 @@
+import { getProjectScope } from '../../../services/projectScope';
 import { Link } from 'react-router-dom';
 import { Files, Search, ArrowUpRight, Pencil, Trash2 } from 'lucide-react';
 import type { Page } from '../../../models/contracts';
 interface Props {
+  readOnly?: boolean;
   pages: Page[];
   loading: boolean;
   query: string;
@@ -18,6 +20,7 @@ export function PageTable({
   onEdit,
   onDelete: setDeleting,
   onCreate,
+  readOnly = false,
 }: Props) {
   return (
     <section className="page-table">
@@ -61,7 +64,10 @@ export function PageTable({
                   .map((page) => (
                     <tr key={page.id}>
                       <td>
-                        <Link className="page-name" to={'/editor/' + page.id}>
+                        <Link
+                          className="page-name"
+                          to={(getProjectScope() ? '/workspace/editor/' : '/editor/') + page.id}
+                        >
                           <span className="file-icon">
                             <Files size={18} />
                           </span>
@@ -85,13 +91,21 @@ export function PageTable({
                       </td>
                       <td>
                         <div className="actions">
-                          <Link className="editor-link" to={'/editor/' + page.id}>
+                          <Link
+                            className="editor-link"
+                            to={(getProjectScope() ? '/workspace/editor/' : '/editor/') + page.id}
+                          >
                             Diseñar <ArrowUpRight size={14} />
                           </Link>
-                          <button aria-label={'Editar ' + page.name} onClick={() => onEdit(page)}>
+                          <button
+                            disabled={readOnly}
+                            aria-label={'Editar ' + page.name}
+                            onClick={() => onEdit(page)}
+                          >
                             <Pencil size={14} />
                           </button>
                           <button
+                            disabled={readOnly}
                             aria-label={'Eliminar ' + page.name}
                             onClick={() => setDeleting(page)}
                           >
@@ -115,7 +129,7 @@ export function PageTable({
                   ? 'Prueba con otro nombre o código.'
                   : 'Crea tu primera página y dale forma en el editor visual.'}
               </p>
-              {!query && (
+              {!query && !readOnly && (
                 <button className="primary" onClick={onCreate}>
                   Crear primera página
                 </button>
@@ -126,7 +140,11 @@ export function PageTable({
       )}
       <footer className="table-footer">
         {pages.length} páginas en tu proyecto
-        <span>Al guardar, los cambios se hacen públicos.</span>
+        <span>
+          {getProjectScope()
+            ? 'Guardar conserva borradores. Solo el propietario publica.'
+            : 'Al guardar, los cambios se hacen públicos.'}
+        </span>
       </footer>
     </section>
   );

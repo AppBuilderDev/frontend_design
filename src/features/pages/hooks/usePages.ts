@@ -1,3 +1,4 @@
+import { getProjectScope } from '../../../services/projectScope';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { pagesApi } from '../../../services/api';
@@ -49,7 +50,8 @@ export function usePages() {
         {
           name: String(data.get('name')).trim(),
           code: code.data,
-          status: editing ? 'published' : 'draft',
+          status: getProjectScope() ? 'draft' : editing ? 'published' : 'draft',
+          revision: editing?.revision,
           components: editing?.components ?? [],
         },
         editing?.id,
@@ -57,7 +59,7 @@ export function usePages() {
       setEditing(undefined);
       await load();
       setNotice('Página guardada');
-      if (!editing) navigate('/editor/' + page.id);
+      if (!editing) navigate((getProjectScope() ? '/workspace/editor/' : '/editor/') + page.id);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -68,7 +70,7 @@ export function usePages() {
     if (!deleting) return;
     setBusy(true);
     try {
-      await pagesApi.remove(deleting.id);
+      await pagesApi.remove(deleting.id, deleting.revision);
       setDeleting(null);
       await load();
       setNotice('Página eliminada');

@@ -1,3 +1,4 @@
+import { entitySchema, type Entity } from './data';
 import { z } from 'zod';
 export interface ComponentNode {
   id: string;
@@ -13,6 +14,10 @@ export interface Page {
   components: ComponentNode[];
   createdAt: string;
   updatedAt: string;
+  revision?: number;
+  projectId?: string;
+  entities?: Entity[];
+  publicationVersion?: number;
 }
 export const CONTRACT_VERSION = 1;
 const jsonValue: z.ZodType<unknown> = z.lazy(() =>
@@ -53,6 +58,10 @@ export const pageSchema = pageInputSchema.extend({
   id: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  revision: z.number().int().optional(),
+  projectId: z.string().optional(),
+  entities: z.array(entitySchema).optional(),
+  publicationVersion: z.number().int().optional(),
 });
 export function validTree(nodes: ComponentNode[]): boolean {
   const ids = new Set<string>();

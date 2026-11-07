@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { usePendingOperation } from '../services/usePendingOperation';
+import { useEffect, useState, type FormEvent } from 'react';
 import type { ComponentNode } from '../models/contracts';
 import {
   movementInput,
@@ -10,7 +11,7 @@ import {
   type MovementList,
 } from '../models/inventory';
 import { useDataContext } from './dataComponents';
-import { ApiError, platformRequest } from '../services/platformHttp';
+import { platformRequest } from '../services/platformHttp';
 const operationLabel = { entry: 'Entrada', exit: 'Salida', adjust: 'Ajuste' };
 export function InventoryPanel({ node }: { node: ComponentNode }) {
   const context = useDataContext();
@@ -55,10 +56,6 @@ export function InventoryPanel({ node }: { node: ComponentNode }) {
     />
   );
 }
-interface PendingMovement {
-  input: MovementInput;
-  uncertain: boolean;
-}
 function InventoryBody({
   projectId,
   preview,
@@ -74,16 +71,6 @@ function InventoryBody({
 }) {
   const base = '/projects/' + projectId + '/inventory';
   const storageKey = 'ab.movement.' + projectId + '.' + access.userId;
-  const [pending, setPending] = useState<PendingMovement | undefined>(() => {
-    try {
-      const raw = sessionStorage.getItem(storageKey);
-      if (!raw) return;
-      const result = movementInput.safeParse(JSON.parse(raw));
-      return result.success ? { input: result.data, uncertain: true } : undefined;
-    } catch {
-      return undefined;
-    }
-  });
   const [query, setQuery] = useState(''),
     [page, setPage] = useState(1),
     [low, setLow] = useState(false),
@@ -107,7 +94,6 @@ function InventoryBody({
   const [error, setError] = useState(''),
     [message, setMessage] = useState(''),
     [busy, setBusy] = useState(false);
-  const lock = useRef(false);
   const key = JSON.stringify({ query, page, low, inactive, filters, version, contextVersion });
   useEffect(() => {
     const controller = new AbortController();
@@ -146,55 +132,32 @@ function InventoryBody({
   const admin = access.role === 'admin',
     canMove = access.role !== 'viewer' && !preview;
   const product = data?.stock.items.find((r) => r.id === selected);
-  const waiting = busy || !!pending || (data !== undefined && data.key !== key);
-  async function execute(input: MovementInput, retrying = false) {
-    if (lock.current || !canMove) return;
-    lock.current = true;
-    setBusy(true);
-    setError('');
-    setMessage('');
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
-    try {
-      const existing = sessionStorage.getItem(storageKey);
-      if (existing) {
-        const parsed = movementInput.safeParse(JSON.parse(existing));
-        if (parsed.success && parsed.data.operationId !== input.operationId) {
-          setPending({ input: parsed.data, uncertain: true });
-          setError(
-            'Hay otro movimiento pendiente en esta pestaña. Confírmalo antes de registrar uno nuevo.',
-          );
-          return;
-        }
-      }
-      sessionStorage.setItem(storageKey, JSON.stringify(input));
-      setPending({ input, uncertain: retrying });
-      const result = await platformRequest<{ movement: Movement; replayed: boolean }>(
-        base + '/movements',
-        { method: 'POST', body: JSON.stringify(input), signal: controller.signal },
-      );
-      sessionStorage.removeItem(storageKey);
-      setPending(undefined);
+  const { pending, execute } = usePendingOperation<
+    MovementInput,
+    { movement: Movement; replayed: boolean }
+  >({
+    storageKey,
+    schema: movementInput,
+    allowed: canMove && !busy,
+    request: (input, signal) =>
+      platformRequest(base + '/movements', { method: 'POST', body: JSON.stringify(input), signal }),
+    onStart: () => {
+      setBusy(true);
+      setError('');
+      setMessage('');
+    },
+    onSuccess: (result) => {
       setMessage(
         (result.replayed ? 'Movimiento ya registrado.' : 'Movimiento registrado.') +
           ' Saldo confirmado: ' +
           result.movement.after,
       );
       refresh();
-    } catch (e) {
-      setError((e as Error).message);
-      if (e instanceof ApiError && e.status >= 400 && e.status < 500 && !retrying) {
-        sessionStorage.removeItem(storageKey);
-        setPending(undefined);
-      } else {
-        setPending({ input, uncertain: true });
-      }
-    } finally {
-      clearTimeout(timer);
-      lock.current = false;
-      setBusy(false);
-    }
-  }
+    },
+    onError: (error) => setError(error.message),
+    onFinally: () => setBusy(false),
+  });
+  const waiting = busy || !!pending || (data !== undefined && data.key !== key);
   async function changeProduct(path: string, input: unknown) {
     if (waiting || preview) return;
     setBusy(true);

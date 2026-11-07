@@ -1,3 +1,5 @@
+import { initializeOperations } from './operationsSchema.ts';
+import { operationInputSchema, type OperationContract } from '../../src/models/operations.ts';
 import { initializeInventory } from './inventorySchema.ts';
 import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
@@ -84,6 +86,7 @@ export class PlatformStore {
     if (version.version !== 1) throw new Error('Versión de base de datos incompatible');
     try {
       initializeInventory(this.db);
+      initializeOperations(this.db);
     } catch (error) {
       this.db.close();
       throw error;
@@ -152,6 +155,21 @@ export class PlatformStore {
           if (field.type === 'relation' && !entities.some((e) => e.id === field.relationEntityId))
             fail(400, 'La entidad relacionada no pertenece a este proyecto');
         if (existing) {
+          if (
+            JSON.stringify(existing.fields) !== JSON.stringify(data.fields) ||
+            existing.labelField !== data.labelField
+          ) {
+            const versions = this.db
+              .prepare(
+                'SELECT v.entities FROM operation_versions v JOIN operations o ON o.id=v.service_id WHERE o.project_id=?',
+              )
+              .all(projectId) as { entities: string }[];
+            if (versions.some((v) => (JSON.parse(v.entities) as Entity[]).some((e) => e.id === id)))
+              fail(
+                409,
+                'La entidad es parte de un contrato de servicio publicado. Consulta su impacto antes de cambiar campos.',
+              );
+          }
           const configured = this.db
             .prepare('SELECT definition FROM inventory_config WHERE project_id=? AND entity_id=?')
             .get(projectId, id) as { definition: string } | undefined;
@@ -217,7 +235,7 @@ export class PlatformStore {
       )
       .all(projectId, entityId) as RecordRow[];
   }
-  private validateValues(
+  validateValues(
     projectId: string,
     entity: EntityInput & { id: string },
     input: unknown,
@@ -227,7 +245,7 @@ export class PlatformStore {
       fail(400, 'Valores de registro inválidos');
     const raw = input as Record<string, unknown>;
     const values: DataRecord['values'] = {};
-    const errors: Record<string, string> = {};
+    const errors: Record<string, string> = Object.create(null);
     for (const key of Object.keys(raw))
       if (!entity.fields.some((f) => f.key === key)) errors[key] = 'Campo no declarado';
     for (const field of entity.fields) {
@@ -501,6 +519,38 @@ export class PlatformStore {
   page(projectId: string, id: string): Page {
     return this.pages(projectId).find((p) => p.id === id) ?? fail(404, 'Página no encontrada');
   }
+  operationContracts(projectId: string, components: ComponentNode[]): OperationContract[] {
+    const contracts = new Map<string, OperationContract>();
+    const visit = (nodes: ComponentNode[]) =>
+      nodes.forEach((node) => {
+        if (node.type === 'ServiceForm') {
+          if (typeof node.props.operationId !== 'string')
+            fail(400, 'Selecciona el servicio del formulario');
+          const row = this.db
+            .prepare(
+              'SELECT id,active,published_version FROM operations WHERE project_id=? AND id=?',
+            )
+            .get(projectId, node.props.operationId) as
+            { id: string; active: number; published_version: number } | undefined;
+          if (!row || !row.active || !row.published_version)
+            fail(400, 'El formulario necesita un servicio activo y publicado');
+          const version = this.db
+            .prepare('SELECT definition FROM operation_versions WHERE service_id=? AND version=?')
+            .get(row.id, row.published_version) as { definition: string };
+          const definition = operationInputSchema.parse(JSON.parse(version.definition));
+          contracts.set(row.id, {
+            id: row.id,
+            name: definition.name,
+            version: row.published_version,
+            inputs: definition.inputs,
+            allowOperators: definition.allowOperators,
+          });
+        }
+        visit(node.children ?? []);
+      });
+    visit(components);
+    return [...contracts.values()];
+  }
   bindings(projectId: string, components: ComponentNode[]): Entity[] {
     const entities = this.entities(projectId),
       used = new Set<string>();
@@ -527,9 +577,11 @@ export class PlatformStore {
             'DataTable',
             'DataDetail',
             'Inventory',
+            'ServiceForm',
           ].includes(n.type)
         )
           fail(400, 'Componente no disponible: ' + n.type);
+        if (n.type === 'ServiceForm') this.operationContracts(projectId, [n]);
         if (n.type === 'Inventory') {
           const config = this.db
             .prepare('SELECT entity_id FROM inventory_config WHERE project_id=?')
@@ -585,6 +637,7 @@ export class PlatformStore {
                 ...draft,
                 projectId,
                 entities: this.bindings(projectId, data.components),
+                operations: this.operationContracts(projectId, data.components),
                 publicationVersion: version,
               })
             : null;

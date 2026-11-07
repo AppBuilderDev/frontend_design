@@ -2175,3 +2175,241 @@ code {
 .inventory-product-grid > :only-child {
   grid-column: 1/-1;
 }
+
+/* Configurable transactional services */
+.operations-workspace {
+  margin-bottom: 32px;
+}
+.operations-workspace h2 {
+  font-size: 21px;
+}
+.operation-template {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+  background: #eeecff;
+  border: 1px solid #d8d1fc;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.operation-template label {
+  display: grid;
+  gap: 7px;
+  min-width: 200px;
+}
+.operation-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.operation-card h3 {
+  margin: 0 0 6px;
+}
+.operation-card > p {
+  margin: 0;
+  color: #60708a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.operation-card > label {
+  display: grid;
+  gap: 8px;
+  max-width: 620px;
+}
+.operation-card > label small {
+  font-weight: 400;
+  color: #60708a;
+  line-height: 1.5;
+}
+.operation-designer {
+  width: min(1100px, 96vw);
+  max-width: min(1100px, 96vw);
+  max-height: 94vh;
+  overflow: auto;
+}
+.operation-designer > p {
+  color: #60708a;
+  line-height: 1.6;
+}
+.operation-designer form {
+  display: grid;
+  gap: 20px;
+}
+.operation-designer form > small {
+  color: #60708a;
+  line-height: 1.5;
+}
+.operation-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #dbe1ea;
+  padding-bottom: 12px;
+}
+.operation-tabs button[aria-selected='true'] {
+  background: #efedff;
+  color: #6253dc;
+  border-color: #d1c9f5;
+}
+.operation-check {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+}
+.operation-check input[type='checkbox'] {
+  width: 16px;
+  flex: 0 0 16px;
+}
+.operation-input,
+.operation-step {
+  border: 1px solid #dbe1ea;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 16px 0;
+  min-width: 0;
+}
+.operation-input legend,
+.operation-step legend {
+  color: #60708a;
+  font-size: 12px;
+  padding: 0 8px;
+}
+.operation-step {
+  display: grid;
+  gap: 16px;
+}
+.operation-step-header {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: end;
+}
+.operation-step-header > label {
+  flex: 1;
+  max-width: 360px;
+}
+.operation-expression {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: start;
+  background: #f5f7fb;
+  padding: 10px;
+  border-radius: 8px;
+  min-width: 0;
+}
+.operation-expression > select {
+  flex: 1;
+  min-width: 150px;
+}
+.operation-expression > input {
+  flex: 1;
+  min-width: 100px;
+}
+.operation-arithmetic {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 1px solid #e1e5ed;
+  padding: 10px;
+  border-radius: 8px;
+}
+.operation-arithmetic .operation-expression {
+  background: white;
+}
+.operation-assignments {
+  display: grid;
+  gap: 14px;
+}
+.operation-assignment {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #e2e6ee;
+  border-radius: 8px;
+}
+.operation-assignment > div:first-child {
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.operation-assignment > div:first-child small {
+  color: #738098;
+  font-size: 11px;
+}
+.operation-assignment > div:first-child button {
+  justify-self: start;
+  font-size: 12px;
+}
+.operation-assignment .operation-expression {
+  align-self: start;
+}
+.operation-validation {
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow: auto;
+}
+.service-form > small {
+  color: #738098;
+}
+.service-form form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+.service-form form > button {
+  justify-self: start;
+}
+.service-form form > label input[type='checkbox'] {
+  width: 18px;
+}
+.service-result {
+  margin-top: 20px;
+}
+.service-result dl {
+  display: grid;
+  gap: 10px;
+}
+.service-result dl > div {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 12px;
+  background: #f5f7fb;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.service-result dt {
+  font-size: 13px;
+  font-weight: 600;
+}
+.service-result dd {
+  margin: 0;
+  font-size: 13px;
+}
+.service-form .inventory-recovery {
+  margin-top: 20px;
+}
+@media (max-width: 800px) {
+  .operation-arithmetic {
+    grid-template-columns: 1fr;
+  }
+  .operation-step-header {
+    align-items: start;
+    flex-direction: column;
+  }
+  .operation-assignment {
+    grid-template-columns: 1fr;
+  }
+  .operation-template {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

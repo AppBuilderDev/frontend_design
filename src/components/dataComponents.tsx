@@ -1,3 +1,4 @@
+import type { OperationContract } from '../models/operations';
 import {
   createContext,
   useCallback,
@@ -19,6 +20,7 @@ import {
 } from '../models/data';
 import { ApiError, platformRequest } from '../services/platformHttp';
 interface DataState {
+  operations: OperationContract[];
   projectId: string;
   entities: Entity[];
   canWrite: boolean;
@@ -34,12 +36,14 @@ export function DataProvider({
   projectId,
   entities,
   canWrite,
+  operations = [],
   preview = false,
   children,
 }: {
   projectId: string;
   entities: Entity[];
   canWrite: boolean;
+  operations?: OperationContract[];
   preview?: boolean;
   children: ReactNode;
 }) {
@@ -52,7 +56,17 @@ export function DataProvider({
   const refresh = useCallback(() => setVersion((v) => v + 1), []);
   return (
     <DataContext.Provider
-      value={{ projectId, entities, canWrite, preview, version, selected, select, refresh }}
+      value={{
+        projectId,
+        entities,
+        operations,
+        canWrite,
+        preview,
+        version,
+        selected,
+        select,
+        refresh,
+      }}
     >
       {children}
     </DataContext.Provider>

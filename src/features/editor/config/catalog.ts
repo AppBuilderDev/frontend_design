@@ -1,4 +1,5 @@
 export const defaults: Record<string, Record<string, unknown>> = {
+  ServiceForm: { operationId: '', buttonText: 'Ejecutar servicio' },
   Inventory: { title: 'Inventario' },
   DataForm: { entityId: '', action: 'create' },
   DataTable: { entityId: '' },

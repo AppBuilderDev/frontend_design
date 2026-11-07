@@ -1,3 +1,4 @@
+import { OperationsStore } from './operations.ts';
 import { InventoryStore } from './inventory.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
@@ -14,6 +15,7 @@ import { randomUUID } from 'node:crypto';
 export function createPlatform(store: PlatformStore) {
   const auth = new PlatformAuth(store);
   const inventory = new InventoryStore(store);
+  const operations = new OperationsStore(store);
 
   return async (
     req: IncomingMessage,
@@ -125,6 +127,90 @@ export function createPlatform(store: PlatformStore) {
       const projectId = match[1],
         rest = match[2] ?? '';
 
+      if (rest === 'operations' || rest.startsWith('operations/')) {
+        const execute = /^operations\/([^/]+)\/(execute|access|options\/([^/]+))$/.exec(rest);
+        if (execute) {
+          if (execute[2] === 'execute' && method === 'POST') {
+            const result = operations.execute(projectId, userId, execute[1], await readBody());
+            send(result.replayed ? 200 : 201, result);
+            return true;
+          }
+          const version = z.coerce.number().int().positive().parse(url.searchParams.get('version'));
+          if (execute[2] === 'access' && method === 'GET') {
+            send(200, operations.access(projectId, userId, execute[1], version));
+            return true;
+          }
+          if (execute[3] && method === 'GET') {
+            send(
+              200,
+              operations.options(
+                projectId,
+                userId,
+                execute[1],
+                version,
+                execute[3],
+                url.searchParams.get('q') ?? '',
+              ),
+            );
+            return true;
+          }
+          fail(404, 'Endpoint no encontrado');
+        }
+        store.access(projectId, userId, !['GET', 'HEAD'].includes(method));
+        if (rest === 'operations') {
+          if (method === 'GET') {
+            send(200, operations.list(projectId));
+            return true;
+          }
+          if (method === 'POST') {
+            send(201, operations.save(projectId, userId, await readBody()));
+            return true;
+          }
+        }
+        const draftOptions = /^operations\/([^/]+)\/draft-options\/([^/]+)$/.exec(rest);
+        if (draftOptions && method === 'GET') {
+          send(
+            200,
+            operations.draftOptions(
+              projectId,
+              userId,
+              draftOptions[1],
+              draftOptions[2],
+              url.searchParams.get('q') ?? '',
+            ),
+          );
+          return true;
+        }
+        const operation = /^operations\/([^/]+)(?:\/(publish|simulate|impact|runs))?$/.exec(rest);
+        if (operation) {
+          const [, id, action] = operation;
+          if (!action && method === 'PUT') {
+            send(200, operations.save(projectId, userId, await readBody(), id));
+            return true;
+          }
+          if (!action && method === 'PATCH') {
+            send(200, operations.configure(projectId, userId, id, await readBody()));
+            return true;
+          }
+          if (action === 'publish' && method === 'POST') {
+            send(200, operations.publish(projectId, userId, id, await readBody()));
+            return true;
+          }
+          if (action === 'simulate' && method === 'POST') {
+            send(200, operations.simulate(projectId, userId, id, await readBody()));
+            return true;
+          }
+          if (action === 'impact' && method === 'GET') {
+            send(200, operations.impact(projectId, id));
+            return true;
+          }
+          if (action === 'runs' && method === 'GET') {
+            send(200, operations.runs(projectId, id));
+            return true;
+          }
+        }
+        fail(404, 'Endpoint no encontrado');
+      }
       if (rest.startsWith('application/')) {
         store.access(projectId, userId, false, true);
         if (rest === 'application/members' && method === 'GET') {

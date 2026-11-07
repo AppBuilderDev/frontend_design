@@ -32,7 +32,7 @@ export class InventoryStore {
     return (
       this.store.db
         .prepare(
-          `SELECT p.id,p.name,o.name AS organization,p.archived,CASE WHEN o.owner_id=? THEN 'admin' ELSE a.role END AS role FROM projects p JOIN organizations o ON o.id=p.organization_id JOIN inventory_config c ON c.project_id=p.id LEFT JOIN application_members a ON a.project_id=p.id AND a.user_id=? WHERE o.owner_id=? OR a.user_id IS NOT NULL ORDER BY o.name`,
+          `SELECT p.id,p.name,o.name AS organization,p.archived,CASE WHEN o.owner_id=? THEN 'admin' ELSE a.role END AS role FROM projects p JOIN organizations o ON o.id=p.organization_id LEFT JOIN application_members a ON a.project_id=p.id AND a.user_id=? WHERE (o.owner_id=? OR a.user_id IS NOT NULL) AND (EXISTS(SELECT 1 FROM inventory_config c WHERE c.project_id=p.id) OR EXISTS(SELECT 1 FROM operations s WHERE s.project_id=p.id AND s.published_version>0)) ORDER BY o.name`,
         )
         .all(userId, userId, userId) as (Omit<ApplicationAccess, 'archived'> & {
         archived: number;
@@ -52,7 +52,7 @@ export class InventoryStore {
       { archived: number; ownerId: string; role: InventoryRole | null } | undefined;
     if (!project || (project.ownerId !== userId && !project.role)) {
       if (this.store.projects(userId).some((p) => p.id === projectId))
-        fail(403, 'Necesitas acceso operativo al inventario. Solicítalo al propietario.');
+        fail(403, 'Necesitas acceso operativo a la aplicación. Solicítalo al propietario.');
       fail(404, 'Proyecto no encontrado');
     }
     if (project.archived) fail(409, 'El proyecto está archivado');

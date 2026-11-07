@@ -10,7 +10,7 @@ const roles = [
   ['none', 'Sin acceso operativo'],
   ['viewer', 'Consulta'],
   ['operator', 'Operador'],
-  ['admin', 'Administrador de inventario'],
+  ['admin', 'Administrador de aplicación'],
 ];
 export function ApplicationTeam({
   projectId,
@@ -40,11 +40,11 @@ export function ApplicationTeam({
   );
   return (
     <section className="workspace-section">
-      <h2>Acceso a la aplicación de inventario</h2>
+      <h2>Acceso a la aplicación</h2>
       <p>
         Estos permisos son independientes del acceso para construir. El propietario administra el
         inventario; los demás necesitan un permiso explícito. Operador: entradas y salidas.
-        Administrador de inventario: también ajustes, mínimos y estado de productos. Consulta: solo
+        Administrador de aplicación: también ajustes, mínimos y estado de productos. Consulta: solo
         lectura.
       </p>
       {error && (
@@ -58,7 +58,7 @@ export function ApplicationTeam({
             <tr>
               <th>Persona</th>
               <th>Correo</th>
-              <th>Permiso en inventario</th>
+              <th>Permiso en la aplicación</th>
             </tr>
           </thead>
           <tbody>
@@ -68,7 +68,7 @@ export function ApplicationTeam({
                 <td>{person.email}</td>
                 <td>
                   {person.userId === ownerId ? (
-                    'Administrador de inventario (propietario)'
+                    'Administrador de aplicación (propietario)'
                   ) : (
                     <select
                       aria-label={'Permiso operativo de ' + person.name}
@@ -103,7 +103,7 @@ export function ApplicationTeam({
           </tbody>
         </table>
       </div>
-      <h3>Invitar a usar el inventario</h3>
+      <h3>Invitar a usar la aplicación</h3>
       <p>
         Esta invitación permite usar la aplicación sin conceder acceso al diseño, entidades o
         publicación.

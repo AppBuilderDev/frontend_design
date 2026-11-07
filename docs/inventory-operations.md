@@ -53,7 +53,7 @@ Base `/api/v1/projects/{projectId}`. Todos requieren sesión, autorización y ca
 | `/application/invitations`         | POST       | Generar invitación de uso de aplicación                        |
 | `/application/invitations/{id}`    | DELETE     | Cancelar invitación pendiente                                  |
 
-Los contratos transaccionales de entrada/salida/ajuste se consultan desde **Servicios**. Son operaciones predeterminadas conectadas al catálogo elegido. Cubren el caso transaccional del inventario de RF-B28; el diseñador de pasos genéricos configurables para servicios arbitrarios todavía no está implementado y corresponde a la siguiente ampliación de backend. No se ejecuta código del usuario.
+Los contratos transaccionales de entrada/salida/ajuste se consultan desde **Servicios**. Son operaciones predeterminadas conectadas al catálogo elegido. Cubren el caso transaccional del inventario de RF-B28; E3-A añade un diseñador de pasos permitidos para servicios propios; consulta [servicios configurables](configurable-services.md). No se ejecuta código del usuario.
 
 ## Compatibilidad y reversión
 
@@ -65,4 +65,4 @@ Las copias y el procedimiento general de recuperación de E1 también incluyen l
 
 ## Requisitos cubiertos y límites
 
-E2 implementa RF-I03 a RF-I10 y los permisos operativos del inventario de RF-B17. RF-B28 queda cubierto para estas tres operaciones predeterminadas; la composición libre de pasos es un pendiente explícito. Continúan fuera de alcance almacenes múltiples, reservas, lotes, valorización/costo promedio, permisos genéricos por campo y flujos avanzados. Se mantienen fuera IA, Figma y sincronización bidireccional.
+E2 implementa RF-I03 a RF-I10 y los permisos operativos del inventario de RF-B17. RF-B28 queda cubierto para estas tres operaciones predeterminadas; E3-A añade composición de pasos permitidos para servicios propios. Continúan fuera de alcance almacenes múltiples, reservas, lotes, valorización/costo promedio, permisos genéricos por campo y flujos avanzados. Se mantienen fuera IA, Figma y sincronización bidireccional.

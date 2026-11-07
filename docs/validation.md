@@ -1,35 +1,31 @@
-# Validación · E1 + inventario operativo E2
+# Validación · E1, E2 y servicios configurables E3-A
 
-Verificado el 6 de noviembre de 2026, con Node 24.18.0. Las pruebas utilizan bases y cuentas temporales, separadas de los datos locales.
+Verificado el 6 de noviembre de 2026 con Node 24.18.0. Se utilizaron bases temporales independientes de los datos locales.
 
 | Comprobación            | Design                             | Runtime                     |
 | ----------------------- | ---------------------------------- | --------------------------- |
 | TypeScript y build Vite | Correcto                           | Correcto                    |
 | ESLint                  | Sin errores ni advertencias        | Sin errores ni advertencias |
 | Prettier                | Correcto                           | Correcto                    |
-| Vitest                  | 25 pruebas correctas en 8 archivos | 3 pruebas correctas         |
+| Vitest                  | 32 pruebas correctas en 9 archivos | 3 pruebas correctas         |
 
-Recorridos Playwright conjuntos: **3 correctos**.
+**4 recorridos conjuntos de Playwright:**
 
-1. Registro, organización, plantilla de inventario, relaciones, precios en centavos, rechazo de decimales excesivos, creación/edición de productos, consulta de servicios, conexión de componentes en Craft, borrador, publicación y creación de datos desde Runtime.
-2. Arrastre real de Craft, deshacer/rehacer, alineación y padding cero, con comprobación en Runtime.
-3. Activación del inventario sobre productos existentes, mínimos, entradas/salidas/ajustes, historial, pérdida de respuesta después de confirmar una escritura, recuperación tras recargar y reintento con el mismo UUID sin duplicación. Publicación del componente Inventory, invitación de un operador sin acceso de construcción, ejecución desde Runtime, rechazo de ajustes no autorizados y revocación del permiso operativo.
+1. Registro, organización, plantilla de inventario, relaciones, centavos, validación de importes, creación/edición de productos, consulta de servicios, componentes conectados, borrador, publicación y escritura desde Runtime.
+2. Arrastre de Craft, historial, alineación y padding cero, comprobados también en Runtime.
+3. Inventario operativo: activación, mínimos, entradas/salidas/ajustes, historial, respuesta perdida después de confirmar una escritura, recuperación tras recargar sin duplicación, operador sin acceso de construcción y revocación del permiso.
+4. Servicios propios: diseñador de cuatro pasos (consultar, comprobar, actualizar, crear), simulación sin escrituras, publicación, ServiceForm, ejecución desde Runtime, pérdida de respuesta con reintento del mismo UUID, versión 2 sin alterar la página vinculada a versión 1, republicación de página y uso por un operador sin inventario activado ni permiso para consultar entidades.
 
-Las pruebas del backend verifican:
+Las pruebas del backend cubren aislamiento por proyecto, permisos de construcción y aplicación, invitaciones, revocación, revisión optimista y publicación exclusiva del propietario. Se comprueba que las versiones antiguas también respetan la política de operadores vigente, que las opciones relacionadas solo devuelven ID/etiqueta y que no se filtra la búsqueda por otros campos.
 
-- Aislamiento por organización, un proyecto por organización, invitaciones de un solo uso, permisos de construcción y publicación exclusiva del propietario.
-- Permisos operativos independientes: administrador/operador/consulta, revocación y rechazo de escrituras directas a rutas ajenas al permiso concedido.
-- Existencias iniciales cero; con saldo cinco y dos salidas simultáneas de cuatro, una se confirma y la otra se rechaza, conservando saldo uno.
-- Reintentos idénticos devuelven el movimiento anterior; reutilizar el identificador con otro contenido se rechaza.
-- Un fallo inyectado en la auditoría revierte movimiento y saldo completos; repetir después la operación permite confirmarla.
-- Enteros exactos hasta el límite seguro, rechazo de cero/fracciones/cantidades inválidas, límites del saldo y prohibición de saldo negativo.
-- Ajustes con saldo observado vigente y referencia al movimiento del mismo producto; movimientos inmutables también frente a escrituras directas en SQLite.
-- Mínimo con revisión y aviso estrictamente por debajo; desactivación con historial conservado y ajustes excepcionales autorizados.
-- Filtros por fecha/tipo/producto/usuario y paginación; validaciones de entidades y registros; estabilidad de publicación y conflictos de edición.
-- Copia SQLite verificada que conserva movimientos y saldos. Apertura de una base E1 sin tablas operativas, conservando cuentas, sesiones, entidades, registros y página publicada; rechazo de una versión futura de inventario incompatible.
+Se verifican transacciones con reversión completa: fallo en un paso posterior a una actualización no deja registros parciales; una simulación no conserva registros, auditoría o ejecuciones. Con saldo cinco y dos solicitudes simultáneas de cuatro, una se confirma y la otra se rechaza. Los reintentos idénticos devuelven el resultado anterior; cambiar el contenido con el mismo UUID se rechaza.
 
-Se inspeccionaron capturas de las pantallas de datos, inventario de Design y aplicación publicada con un operador.
+Se comprueban expresiones y referencias a pasos anteriores, tipos base, enteros seguros, desbordamiento, parámetros reservados, validaciones de escritura, relaciones y condiciones. Las versiones publicadas mantienen sus contratos; se rechazan cambios a los campos y al campo de etiqueta de entidades usadas por servicios publicados. El análisis de impacto identifica las páginas y versiones vinculadas. Se puede cambiar la versión predeterminada o desactivar todas las versiones.
 
-Los escenarios antiguos de `e2e/` permanecen como batería legacy y no forman parte de estos tres recorridos nuevos. No se modificaron ni importaron los JSON anteriores. No se han hecho pruebas de carga, alta disponibilidad o recuperación de un servidor de producción.
+El inventario mantiene sus movimientos inmutables, saldos no negativos, permisos, mínimos y correcciones justificadas. Su recuperación de solicitudes se extrajo a un mecanismo compartido con ServiceForm; el recorrido de desconexión de inventario se ejecutó otra vez después de la extracción y conservó el comportamiento.
 
-Vite conserva avisos no bloqueantes de anotaciones de Zod y tamaño del paquete de Design. Continúan pendientes el diseñador genérico de pasos transaccionales para cualquier servicio, permisos por campo, múltiples almacenes y colaboración en tiempo real. [Alcance y compatibilidad de E2](inventory-operations.md).
+Las pruebas de compatibilidad abren bases E1 y E2 sin reescribir cuentas, sesiones, entidades, registros, páginas ni movimientos; agregan las extensiones requeridas y rechazan versiones futuras incompatibles. Una copia verificada conserva movimientos, versiones de servicios y ejecuciones confirmadas. Se inspeccionaron capturas del diseñador y de los formularios publicados.
+
+Los escenarios de `e2e/` se conservan como batería legacy y no forman parte de estos cuatro recorridos. Los JSON anteriores no se migraron ni sobrescribieron. No se han hecho pruebas de carga, alta disponibilidad o recuperación de producción. Vite conserva avisos no bloqueantes sobre anotaciones de Zod y tamaño del paquete de Design.
+
+Pendientes de E3: APIs externas, ambientes, secretos en backend, gateway y migración explícita de datos anteriores. Siguen pendientes permisos por campo/usuario, flujos con ramas y colaboración en tiempo real. [Alcance y compatibilidad de servicios](configurable-services.md).

@@ -40,3 +40,7 @@ La versión inicial del esquema SQLite es 1. Los identificadores y tipos de camp
 ## Extensión de inventario E2
 
 El nuevo backend agrega las tablas operativas al abrir una base E1, sin reescribir sus registros. El inventario se conecta explícitamente y comienza con saldo cero. Antes de actualizar una base compartida, generar una copia verificada. Para volver a E1, detener las escrituras y conservar las tablas nuevas; no eliminarlas ni descartar movimientos posteriores a la copia. [Operación, servicios y compatibilidad de inventario](inventory-operations.md).
+
+## Extensión de servicios E3-A
+
+La API agrega tablas de servicios, versiones y ejecuciones sin reescribir la base E2. Obtener una copia verificada antes de actualizar un entorno compartido y desplegar ambos frontends junto al backend. Para volver al checkpoint anterior, detener escrituras y conservar la base actual completa; no borrar las tablas nuevas. El checkpoint E2 no reconoce ServiceForm ni sus servicios. [Compatibilidad, límites y recuperación](configurable-services.md).

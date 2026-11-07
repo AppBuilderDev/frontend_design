@@ -144,6 +144,44 @@ export function PropertiesPanel({
               </small>
             </>
           )}
+          {node.type === 'ServiceForm' && (
+            <>
+              <div className="panel-heading">Conexión de servicio</div>
+              <label>
+                Servicio publicado
+                <select
+                  aria-label="Servicio conectado"
+                  value={String(node.props.operationId ?? '')}
+                  onChange={(e) => prop('operationId', e.target.value)}
+                >
+                  <option value="">Seleccionar servicio…</option>
+                  {data?.operations.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name} · v{o.version}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Título del formulario
+                <input
+                  value={String(node.props.title ?? '')}
+                  onChange={(e) => prop('title', e.target.value)}
+                />
+              </label>
+              <label>
+                Texto del botón
+                <input
+                  value={String(node.props.buttonText ?? 'Ejecutar servicio')}
+                  onChange={(e) => prop('buttonText', e.target.value)}
+                />
+              </label>
+              <small>
+                Publicar captura la versión predeterminada del servicio. El borrador y la vista
+                previa no ejecutan escrituras.
+              </small>
+            </>
+          )}
           <StyleControls node={node} onChange={prop} />
           <div className="panel-heading">Organizar</div>
           <div className="actions">

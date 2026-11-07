@@ -1,3 +1,4 @@
+import { useOperations } from '../workspace/useOperations';
 import { DataProvider } from '../../components/dataComponents';
 import { getProjectScope } from '../../services/projectScope';
 import { useEntities } from '../workspace/useEntities';
@@ -28,6 +29,7 @@ export function Editor() {
   const session = useEditor();
   const scope = getProjectScope();
   const { entities } = useEntities(scope?.id);
+  const { operations } = useOperations(scope?.id);
   if (!session.page)
     return (
       <main className="screen-message">
@@ -56,6 +58,9 @@ export function Editor() {
         <DataProvider
           projectId={scope.id}
           entities={entities}
+          operations={operations.flatMap((o) =>
+            o.active ? o.versions.filter((v) => v.version === o.publishedVersion) : [],
+          )}
           canWrite={scope.role !== 'reader'}
           preview
         >

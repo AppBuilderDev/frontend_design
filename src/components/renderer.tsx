@@ -1,3 +1,4 @@
+import { ServiceForm } from './ServiceForm';
 import { InventoryPanel } from './InventoryPanel';
 import { DataForm, DataTable, DataDetail, useDataContext } from './dataComponents';
 import { Component, type ReactNode, type CSSProperties, type ComponentType } from 'react';
@@ -22,9 +23,11 @@ export const catalog = [
   'DataTable',
   'DataDetail',
   'Inventory',
+  'ServiceForm',
 ] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
   Inventory: InventoryPanel,
+  ServiceForm,
   DataForm,
   DataTable,
   DataDetail,

@@ -41,17 +41,21 @@ No se afirma cobertura completa de todos los RF: el control fino por campo, las 
 
 ## E2 · Inventario operativo implementado
 
-Entradas, salidas y ajustes con transacciones, enteros, saldo no negativo, idempotencia, historial inmutable, mínimos y permisos operativos independientes. Se puede publicar el componente Inventory y usar la aplicación sin acceso de construcción. Véase [alcance, operación y compatibilidad](inventory-operations.md). RF-B28 está cubierto por servicios transaccionales predeterminados; la composición libre de pasos continúa pendiente.
+Entradas, salidas y ajustes con transacciones, enteros, saldo no negativo, idempotencia, historial inmutable, mínimos y permisos operativos independientes. Se puede publicar el componente Inventory y usar la aplicación sin acceso de construcción. Véase [alcance, operación y compatibilidad](inventory-operations.md). RF-B28 comenzó con los servicios predeterminados y E3-A incorpora composición de pasos permitidos, como se describe a continuación.
+
+## E3-A · Servicios propios configurables implementados
+
+Diseñador de entradas, consultas por ID, condiciones, creaciones y actualizaciones con transacciones; expresiones de suma/resta seguras; simulación que revierte todas sus escrituras; publicación exclusiva del propietario; versiones inmutables, selección de versión anterior e impacto de dependencias. El componente ServiceForm consume el contrato capturado por la página y confirma reintentos de forma idempotente. Véase [guía de servicios configurables](configurable-services.md).
 
 ## Próximas entregas en orden
 
-2. **E3 · Servicios e integraciones:** operaciones declarativas con varias entidades, secretos en backend, ambientes, contratos versionados, análisis de impacto y reversión de publicaciones. Migración de datos anteriores mediante una herramienta explícita y comprobable.
+2. **E3, siguientes bloques · Integraciones y ambientes:** conexiones externas con secretos en backend, ambientes, gateway y evolución de contratos externos. Migración de datos anteriores mediante una herramienta explícita y comprobable. E3-A ya cubre servicios propios de varios pasos y sus versiones.
 3. **E4 · Reglas y flujos:** condiciones, fórmulas con enteros y escala explícita, aprobaciones y componentes avanzados para desarrolladores.
 4. **E5 · Equipo:** presencia y edición simultánea con resolución de conflictos, comentarios, historial recuperable y módulos reutilizables.
 5. **E6 · Inventario avanzado:** varios almacenes, transferencias, lotes, códigos de barras e importaciones de datos. No incluye Figma.
 
 ## Límites conocidos del piloto
 
-Hasta 50 entidades por proyecto, 30 campos por entidad, 5000 registros por entidad y 100 páginas por proyecto. Los listados filtran y ordenan dentro del proceso; no es una solución de gran volumen. No hay envío automático de correo, verificación de correo ni recuperación de contraseña. El registro se usa en un piloto controlado. No hay ejecución de código libre, tareas programadas de negocio, transacciones compuestas configurables ni alta disponibilidad. Los permisos de aplicación actuales cubren inventario; los permisos genéricos por servicio/campo siguen pendientes.
+Hasta 50 entidades por proyecto, 30 campos por entidad, 5000 registros por entidad y 100 páginas por proyecto. Los listados filtran y ordenan dentro del proceso; no es una solución de gran volumen. No hay envío automático de correo, verificación de correo ni recuperación de contraseña. El registro se usa en un piloto controlado. No hay ejecución de código libre, tareas programadas de negocio, flujos con ramificaciones ni alta disponibilidad. Los permisos de aplicación cubren inventario y ejecución por rol de servicios publicados; los permisos individuales por servicio o campo siguen pendientes.
 
 El backend autoriza el acceso en cada solicitud; ocultar controles no es la medida de seguridad. No se debe habilitar la API legacy en un entorno compartido. Para una siguiente apertura pública hacen falta verificación de identidad/correo, recuperación de cuenta, operación administrada y una revisión de seguridad de despliegue.

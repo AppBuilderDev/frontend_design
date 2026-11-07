@@ -2413,3 +2413,122 @@ code {
     flex-direction: column;
   }
 }
+
+/* External connections */
+.connections-workspace {
+  margin-bottom: 32px;
+}
+.connection-policy {
+  padding: 16px;
+  border: 1px solid #dbe1ea;
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.connection-policy summary {
+  cursor: pointer;
+  color: #6253dc;
+}
+.connection-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.connection-card h3 {
+  margin: 0 0 6px;
+}
+.connection-card > p {
+  color: #60708a;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.connection-card > label {
+  display: grid;
+  gap: 8px;
+  max-width: 600px;
+}
+.connection-card > button {
+  justify-self: start;
+}
+.connection-designer {
+  width: min(1050px, 96vw);
+  max-width: min(1050px, 96vw);
+  max-height: 93vh;
+  overflow: auto;
+}
+.connection-designer form {
+  display: grid;
+  gap: 20px;
+}
+.connection-designer fieldset {
+  border: 1px solid #dbe1ea;
+  border-radius: 8px;
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+.connection-designer legend {
+  font-size: 12px;
+  color: #60708a;
+  padding: 0 8px;
+}
+.connection-field-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.connection-designer fieldset > button {
+  justify-self: start;
+}
+.connection-test {
+  max-width: min(900px, 96vw);
+  width: min(900px, 96vw);
+  max-height: 93vh;
+  overflow: auto;
+}
+.connection-results {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.connection-results table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.connection-results th,
+.connection-results td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e6ef;
+  max-width: 380px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.connection-results th {
+  background: #f5f7fb;
+  color: #60708a;
+  font-weight: 500;
+}
+.connection-results > small {
+  color: #738098;
+}
+@media (max-width: 800px) {
+  .connection-field-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .connection-card header {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+@media (max-width: 500px) {
+  .connection-field-grid {
+    grid-template-columns: 1fr;
+  }
+}

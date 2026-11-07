@@ -1,3 +1,4 @@
+import { ApiQuery } from './ApiQuery';
 import { ServiceForm } from './ServiceForm';
 import { InventoryPanel } from './InventoryPanel';
 import { DataForm, DataTable, DataDetail, useDataContext } from './dataComponents';
@@ -24,10 +25,12 @@ export const catalog = [
   'DataDetail',
   'Inventory',
   'ServiceForm',
+  'ApiQuery',
 ] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
   Inventory: InventoryPanel,
   ServiceForm,
+  ApiQuery,
   DataForm,
   DataTable,
   DataDetail,

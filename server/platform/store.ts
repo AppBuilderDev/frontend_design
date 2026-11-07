@@ -1,10 +1,15 @@
+import { initializeConnections } from './connectionsSchema.ts';
+import {
+  connectionDefinitionSchema,
+  type ConnectionContract,
+} from '../../src/models/connections.ts';
 import { initializeOperations } from './operationsSchema.ts';
 import { operationInputSchema, type OperationContract } from '../../src/models/operations.ts';
 import { initializeInventory } from './inventorySchema.ts';
 import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
   entityInputSchema,
@@ -87,6 +92,7 @@ export class PlatformStore {
     try {
       initializeInventory(this.db);
       initializeOperations(this.db);
+      initializeConnections(this.db);
     } catch (error) {
       this.db.close();
       throw error;
@@ -519,6 +525,62 @@ export class PlatformStore {
   page(projectId: string, id: string): Page {
     return this.pages(projectId).find((p) => p.id === id) ?? fail(404, 'Página no encontrada');
   }
+  connectionContracts(projectId: string, nodes: ComponentNode[]): ConnectionContract[] {
+    const contracts = new Map<string, ConnectionContract>();
+    const visit = (nodes: ComponentNode[]) =>
+      nodes.forEach((node) => {
+        if (node.type === 'ApiQuery') {
+          if (typeof node.props.connectionId !== 'string')
+            fail(400, 'Selecciona la conexión de la consulta');
+          const row = this.db
+            .prepare(
+              'SELECT id,active,published_version FROM connections WHERE project_id=? AND id=?',
+            )
+            .get(projectId, node.props.connectionId) as
+            { id: string; active: number; published_version: number } | undefined;
+          if (!row || !row.active || !row.published_version)
+            fail(400, 'La consulta necesita una conexión activa y publicada');
+          const version = this.db
+            .prepare(
+              'SELECT definition FROM connection_versions WHERE connection_id=? AND version=?',
+            )
+            .get(row.id, row.published_version) as { definition: string };
+          const definition = connectionDefinitionSchema.parse(JSON.parse(version.definition));
+          const environment = this.db
+            .prepare(
+              "SELECT revision FROM connection_environments WHERE connection_id=? AND environment='production'",
+            )
+            .get(row.id) as { revision: number } | undefined;
+          if (!environment) fail(400, 'Falta configurar producción para la conexión');
+          const hash = createHash('sha256').update(JSON.stringify(definition)).digest('hex');
+          const check = this.db
+            .prepare(
+              "SELECT status FROM connection_checks WHERE connection_id=? AND environment='production' AND environment_revision=? AND definition_hash=?",
+            )
+            .get(row.id, environment.revision, hash) as { status: string } | undefined;
+          if (check?.status !== 'ok')
+            fail(
+              400,
+              'Comprueba la configuración de producción para esta versión antes de publicar la página',
+            );
+          contracts.set(row.id, {
+            id: row.id,
+            name: definition.name,
+            version: row.published_version,
+            inputs: definition.inputs,
+            fields: definition.fields.map(({ key, label, type, required }) => ({
+              key,
+              label,
+              type,
+              required,
+            })),
+          });
+        }
+        visit(node.children ?? []);
+      });
+    visit(nodes);
+    return [...contracts.values()];
+  }
   operationContracts(projectId: string, components: ComponentNode[]): OperationContract[] {
     const contracts = new Map<string, OperationContract>();
     const visit = (nodes: ComponentNode[]) =>
@@ -578,9 +640,11 @@ export class PlatformStore {
             'DataDetail',
             'Inventory',
             'ServiceForm',
+            'ApiQuery',
           ].includes(n.type)
         )
           fail(400, 'Componente no disponible: ' + n.type);
+        if (n.type === 'ApiQuery') this.connectionContracts(projectId, [n]);
         if (n.type === 'ServiceForm') this.operationContracts(projectId, [n]);
         if (n.type === 'Inventory') {
           const config = this.db
@@ -638,6 +702,7 @@ export class PlatformStore {
                 projectId,
                 entities: this.bindings(projectId, data.components),
                 operations: this.operationContracts(projectId, data.components),
+                connections: this.connectionContracts(projectId, data.components),
                 publicationVersion: version,
               })
             : null;

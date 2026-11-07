@@ -1,3 +1,4 @@
+import type { ConnectionContract } from '../models/connections';
 import type { OperationContract } from '../models/operations';
 import {
   createContext,
@@ -20,6 +21,7 @@ import {
 } from '../models/data';
 import { ApiError, platformRequest } from '../services/platformHttp';
 interface DataState {
+  connections: ConnectionContract[];
   operations: OperationContract[];
   projectId: string;
   entities: Entity[];
@@ -37,6 +39,7 @@ export function DataProvider({
   entities,
   canWrite,
   operations = [],
+  connections = [],
   preview = false,
   children,
 }: {
@@ -44,6 +47,7 @@ export function DataProvider({
   entities: Entity[];
   canWrite: boolean;
   operations?: OperationContract[];
+  connections?: ConnectionContract[];
   preview?: boolean;
   children: ReactNode;
 }) {
@@ -60,6 +64,7 @@ export function DataProvider({
         projectId,
         entities,
         operations,
+        connections,
         canWrite,
         preview,
         version,

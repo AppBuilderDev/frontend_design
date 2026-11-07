@@ -47,9 +47,13 @@ Entradas, salidas y ajustes con transacciones, enteros, saldo no negativo, idemp
 
 Diseñador de entradas, consultas por ID, condiciones, creaciones y actualizaciones con transacciones; expresiones de suma/resta seguras; simulación que revierte todas sus escrituras; publicación exclusiva del propietario; versiones inmutables, selección de versión anterior e impacto de dependencias. El componente ServiceForm consume el contrato capturado por la página y confirma reintentos de forma idempotente. Véase [guía de servicios configurables](configurable-services.md).
 
+## E3-B · Conexiones externas de lectura implementadas
+
+Conexiones GET HTTPS con entradas tipadas y proyección de respuestas, pruebas/producción con URL y credenciales separadas, cifrado en backend, controles de red y límites. El propietario comprueba producción antes de publicar y las páginas capturan contratos versionados mediante ApiQuery. Los ambientes de este bloque corresponden a conexiones externas, no a datos locales aislados. Véase [guía de conexiones](external-connections.md).
+
 ## Próximas entregas en orden
 
-2. **E3, siguientes bloques · Integraciones y ambientes:** conexiones externas con secretos en backend, ambientes, gateway y evolución de contratos externos. Migración de datos anteriores mediante una herramienta explícita y comprobable. E3-A ya cubre servicios propios de varios pasos y sus versiones.
+2. **E3, siguiente bloque · Importación y evolución:** migración explícita y revisable de los datos anteriores. E3-B ya cubre conexiones externas de lectura, ambientes de conexión y gateway. Los ambientes completos con datos/despliegues separados y conectores de escritura continúan pendientes.
 3. **E4 · Reglas y flujos:** condiciones, fórmulas con enteros y escala explícita, aprobaciones y componentes avanzados para desarrolladores.
 4. **E5 · Equipo:** presencia y edición simultánea con resolución de conflictos, comentarios, historial recuperable y módulos reutilizables.
 5. **E6 · Inventario avanzado:** varios almacenes, transferencias, lotes, códigos de barras e importaciones de datos. No incluye Figma.

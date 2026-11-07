@@ -1,3 +1,5 @@
+import { ConnectionsStore, type ConnectionOptions } from './connections.ts';
+import { environmentSchema } from '../../src/models/connections.ts';
 import { OperationsStore } from './operations.ts';
 import { InventoryStore } from './inventory.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -12,7 +14,11 @@ import { blockInputSchema } from '../../src/models/blocks.ts';
 
 import { randomUUID } from 'node:crypto';
 
-export function createPlatform(store: PlatformStore) {
+export function createPlatform(
+  store: PlatformStore,
+  options: { connections?: ConnectionOptions } = {},
+) {
+  const connections = new ConnectionsStore(store, options.connections);
   const auth = new PlatformAuth(store);
   const inventory = new InventoryStore(store);
   const operations = new OperationsStore(store);
@@ -127,6 +133,86 @@ export function createPlatform(store: PlatformStore) {
       const projectId = match[1],
         rest = match[2] ?? '';
 
+      if (rest === 'connections' || rest.startsWith('connections/')) {
+        const runtime = /^connections\/([^/]+)\/(query|access)$/.exec(rest);
+        if (runtime) {
+          if (runtime[2] === 'query' && method === 'POST') {
+            send(200, await connections.query(projectId, userId, runtime[1], await readBody()));
+            return true;
+          }
+          if (runtime[2] === 'access' && method === 'GET') {
+            const version = z.coerce
+              .number()
+              .int()
+              .positive()
+              .parse(url.searchParams.get('version'));
+            send(200, connections.access(projectId, userId, runtime[1], version));
+            return true;
+          }
+          fail(404, 'Endpoint no encontrado');
+        }
+        store.access(projectId, userId, !['GET', 'HEAD'].includes(method));
+        if (rest === 'connections/policy' && method === 'GET') {
+          store.access(projectId, userId, false, true);
+          send(200, connections.policy());
+          return true;
+        }
+        if (rest === 'connections') {
+          if (method === 'GET') {
+            send(200, connections.list(projectId));
+            return true;
+          }
+          if (method === 'POST') {
+            send(201, connections.save(projectId, userId, await readBody()));
+            return true;
+          }
+        }
+        const environment = /^connections\/([^/]+)\/environments(?:\/([^/]+))?$/.exec(rest);
+        if (environment) {
+          if (!environment[2] && method === 'GET') {
+            send(200, connections.environments(projectId, userId, environment[1]));
+            return true;
+          }
+          if (environment[2] && method === 'PUT') {
+            send(
+              200,
+              connections.configureEnvironment(
+                projectId,
+                userId,
+                environment[1],
+                environmentSchema.parse(environment[2]),
+                await readBody(),
+              ),
+            );
+            return true;
+          }
+        }
+        const connection = /^connections\/([^/]+)(?:\/(publish|test|details))?$/.exec(rest);
+        if (connection) {
+          const [, id, action] = connection;
+          if (!action && method === 'PUT') {
+            send(200, connections.save(projectId, userId, await readBody(), id));
+            return true;
+          }
+          if (!action && method === 'PATCH') {
+            send(200, connections.configure(projectId, userId, id, await readBody()));
+            return true;
+          }
+          if (action === 'publish' && method === 'POST') {
+            send(200, connections.publish(projectId, userId, id, await readBody()));
+            return true;
+          }
+          if (action === 'test' && method === 'POST') {
+            send(200, await connections.test(projectId, userId, id, await readBody()));
+            return true;
+          }
+          if (action === 'details' && method === 'GET') {
+            send(200, connections.details(projectId, id));
+            return true;
+          }
+        }
+        fail(404, 'Endpoint no encontrado');
+      }
       if (rest === 'operations' || rest.startsWith('operations/')) {
         const execute = /^operations\/([^/]+)\/(execute|access|options\/([^/]+))$/.exec(rest);
         if (execute) {

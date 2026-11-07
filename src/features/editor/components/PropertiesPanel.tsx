@@ -182,6 +182,44 @@ export function PropertiesPanel({
               </small>
             </>
           )}
+          {node.type === 'ApiQuery' && (
+            <>
+              <div className="panel-heading">Conexión externa</div>
+              <label>
+                Conexión publicada
+                <select
+                  aria-label="Conexión externa seleccionada"
+                  value={String(node.props.connectionId ?? '')}
+                  onChange={(e) => prop('connectionId', e.target.value)}
+                >
+                  <option value="">Seleccionar conexión…</option>
+                  {data?.connections.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} · v{c.version}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Título de consulta
+                <input
+                  value={String(node.props.title ?? '')}
+                  onChange={(e) => prop('title', e.target.value)}
+                />
+              </label>
+              <label>
+                Texto para consultar
+                <input
+                  value={String(node.props.buttonText ?? 'Consultar')}
+                  onChange={(e) => prop('buttonText', e.target.value)}
+                />
+              </label>
+              <small>
+                Runtime consulta producción a través del backend. La vista previa no realiza
+                consultas externas.
+              </small>
+            </>
+          )}
           <StyleControls node={node} onChange={prop} />
           <div className="panel-heading">Organizar</div>
           <div className="actions">

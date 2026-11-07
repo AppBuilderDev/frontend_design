@@ -70,3 +70,9 @@ En **Inventario**, el propietario conecta el catálogo existente. Después puede
 En **Servicios**, crea una operación con entradas, consultas, condiciones y escrituras. **Simular** revierte todos los cambios. El propietario publica una versión; un componente `ServiceForm` permite ejecutarla desde Runtime. Las páginas mantienen su versión hasta republicarse, y se pueden consultar impacto y últimas ejecuciones. El almacenamiento anterior se conserva.
 
 [Guía del diseñador, permisos, versiones y recuperación](docs/configurable-services.md).
+
+## Conexiones externas de lectura (E3-B)
+
+El administrador prepara los dominios con `npm run connectors:setup -- api.proveedor.com` y reinicia la API. En **Servicios → Conexiones externas**, definir el contrato, configurar pruebas/producción, comprobar producción y publicar. El componente `ApiQuery` muestra los datos validados desde Runtime sin incluir credenciales en las páginas. La configuración de ambiente de este bloque corresponde solo a conexiones, no a bases locales separadas.
+
+[Configuración, permisos, cifrado, límites y recuperación](docs/external-connections.md). El E2E usa un proveedor simulado; el servidor normal mantiene HTTPS real.

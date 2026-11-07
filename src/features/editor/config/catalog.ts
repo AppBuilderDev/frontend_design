@@ -1,4 +1,5 @@
 export const defaults: Record<string, Record<string, unknown>> = {
+  ApiQuery: { connectionId: '', buttonText: 'Consultar' },
   ServiceForm: { operationId: '', buttonText: 'Ejecutar servicio' },
   Inventory: { title: 'Inventario' },
   DataForm: { entityId: '', action: 'create' },

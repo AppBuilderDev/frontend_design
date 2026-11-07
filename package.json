@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "backup": "tsx --env-file-if-exists=.env server/platform/backup.ts",
-    "test:e2e:legacy": "playwright test --config playwright.config.ts"
+    "test:e2e:legacy": "playwright test --config playwright.config.ts",
+    "connectors:setup": "tsx server/platform/setupConnections.ts"
   },
   "dependencies": {
     "@craftjs/core": "^0.2.12",

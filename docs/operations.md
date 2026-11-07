@@ -44,3 +44,7 @@ El nuevo backend agrega las tablas operativas al abrir una base E1, sin reescrib
 ## Extensión de servicios E3-A
 
 La API agrega tablas de servicios, versiones y ejecuciones sin reescribir la base E2. Obtener una copia verificada antes de actualizar un entorno compartido y desplegar ambos frontends junto al backend. Para volver al checkpoint anterior, detener escrituras y conservar la base actual completa; no borrar las tablas nuevas. El checkpoint E2 no reconoce ServiceForm ni sus servicios. [Compatibilidad, límites y recuperación](configurable-services.md).
+
+## Extensión de conexiones E3-B
+
+La copia de SQLite conserva credenciales cifradas, pero requiere la misma `CONNECTOR_MASTER_KEY` para recuperarlas. Conservar una copia protegida de esa clave separada del repositorio y de los artefactos públicos. La lista de dominios autorizados también pertenece a la configuración del servidor. Los ambientes de este bloque separan únicamente orígenes y credenciales de conexiones, no los registros locales. [Guía de conexiones y recuperación](external-connections.md).

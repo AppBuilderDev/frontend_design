@@ -10,3 +10,6 @@ server/data/*.tmp
 
 server/data/*.sqlite*
 server/data/backups/
+
+.env.connector-*.tmp
+.env.connector.lock

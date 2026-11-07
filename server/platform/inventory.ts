@@ -32,7 +32,7 @@ export class InventoryStore {
     return (
       this.store.db
         .prepare(
-          `SELECT p.id,p.name,o.name AS organization,p.archived,CASE WHEN o.owner_id=? THEN 'admin' ELSE a.role END AS role FROM projects p JOIN organizations o ON o.id=p.organization_id LEFT JOIN application_members a ON a.project_id=p.id AND a.user_id=? WHERE (o.owner_id=? OR a.user_id IS NOT NULL) AND (EXISTS(SELECT 1 FROM inventory_config c WHERE c.project_id=p.id) OR EXISTS(SELECT 1 FROM operations s WHERE s.project_id=p.id AND s.published_version>0)) ORDER BY o.name`,
+          `SELECT p.id,p.name,o.name AS organization,p.archived,CASE WHEN o.owner_id=? THEN 'admin' ELSE a.role END AS role FROM projects p JOIN organizations o ON o.id=p.organization_id LEFT JOIN application_members a ON a.project_id=p.id AND a.user_id=? WHERE (o.owner_id=? OR a.user_id IS NOT NULL) AND (EXISTS(SELECT 1 FROM inventory_config c WHERE c.project_id=p.id) OR EXISTS(SELECT 1 FROM operations s WHERE s.project_id=p.id AND s.published_version>0) OR EXISTS(SELECT 1 FROM connections c WHERE c.project_id=p.id AND c.published_version>0)) ORDER BY o.name`,
         )
         .all(userId, userId, userId) as (Omit<ApplicationAccess, 'archived'> & {
         archived: number;

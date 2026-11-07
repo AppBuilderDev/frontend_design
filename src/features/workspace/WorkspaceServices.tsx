@@ -1,3 +1,4 @@
+import { ConnectionsWorkspace } from './ConnectionsWorkspace';
 import { OperationsWorkspace } from './OperationsWorkspace';
 import { InventoryServices } from './InventoryServices';
 import { useState } from 'react';
@@ -24,6 +25,7 @@ export function WorkspaceServices() {
           Administrar entidades
         </Link>
       </div>
+      <ConnectionsWorkspace />
       <OperationsWorkspace entities={entities} />
       <InventoryServices projectId={project.id} />
       {error && (

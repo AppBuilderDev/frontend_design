@@ -10,7 +10,7 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:5183', headless: true, trace: 'retain-on-failure' },
   webServer: [
     {
-      command: 'npm run api',
+      command: 'npx tsx e2e-platform/fixtures/api.ts',
       url: 'http://127.0.0.1:3101/api/v1/auth/session',
       reuseExistingServer: false,
       env: {

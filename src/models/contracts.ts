@@ -1,3 +1,4 @@
+import { connectionContractSchema, type ConnectionContract } from './connections';
 import { operationContractSchema, type OperationContract } from './operations';
 import { entitySchema, type Entity } from './data';
 import { z } from 'zod';
@@ -19,6 +20,7 @@ export interface Page {
   projectId?: string;
   entities?: Entity[];
   operations?: OperationContract[];
+  connections?: ConnectionContract[];
   publicationVersion?: number;
 }
 export const CONTRACT_VERSION = 1;
@@ -64,6 +66,7 @@ export const pageSchema = pageInputSchema.extend({
   projectId: z.string().optional(),
   entities: z.array(entitySchema).optional(),
   operations: z.array(operationContractSchema).optional(),
+  connections: z.array(connectionContractSchema).optional(),
   publicationVersion: z.number().int().optional(),
 });
 export function validTree(nodes: ComponentNode[]): boolean {

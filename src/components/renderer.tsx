@@ -1,3 +1,4 @@
+import { InventoryPanel } from './InventoryPanel';
 import { DataForm, DataTable, DataDetail, useDataContext } from './dataComponents';
 import { Component, type ReactNode, type CSSProperties, type ComponentType } from 'react';
 import type { ComponentNode } from '../models/contracts';
@@ -20,8 +21,10 @@ export const catalog = [
   'DataForm',
   'DataTable',
   'DataDetail',
+  'Inventory',
 ] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
+  Inventory: InventoryPanel,
   DataForm,
   DataTable,
   DataDetail,

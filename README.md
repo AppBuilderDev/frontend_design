@@ -1,6 +1,6 @@
 # AppBuilderDev · Design y backend
 
-Primera entrega del builder para aplicaciones internas. Rama `build/inventario`. React, TypeScript, Craft.js y API Node con SQLite transaccional. Usar **Node 24 LTS** y npm; instalar las dependencias en ambos repositorios.
+Builder para aplicaciones internas. Rama `build/inventario`. React, TypeScript, Craft.js y API Node con SQLite transaccional. Usar **Node 24 LTS** y npm; instalar las dependencias en ambos repositorios.
 
 ## Ejecutar
 
@@ -58,3 +58,9 @@ El recorrido E2E inicia API, Design y Runtime en 3101/5183/5184 con una base tem
 - `tests` / `e2e-platform`: verificaciones de API, permisos, persistencia y recorrido en navegador.
 
 [Decisiones, requisitos y etapas](docs/build-plan.md) · [Operación y recuperación](docs/operations.md).
+
+## Inventario operativo (E2)
+
+En **Inventario**, el propietario conecta el catálogo existente. Después puede registrar entradas/salidas, ajustes justificados, configurar mínimos y consultar historial. **Equipo y proyecto** administra los permisos operativos independientes y las invitaciones para usar la aplicación sin construirla. Publicar el componente `Inventory` lleva el mismo flujo a Runtime. Los saldos empiezan en cero y no se modifican los registros anteriores.
+
+[Guía de inventario, servicios, permisos y compatibilidad](docs/inventory-operations.md).

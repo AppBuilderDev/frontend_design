@@ -1,3 +1,4 @@
+import type { ApplicationAccess } from './inventory';
 import { z } from 'zod';
 export const keySchema = z
   .string()
@@ -74,6 +75,7 @@ export interface ProjectAccess {
   archived: boolean;
 }
 export interface PlatformSession {
+  applications?: ApplicationAccess[];
   user: { id: string; name: string; email: string };
   projects: ProjectAccess[];
 }

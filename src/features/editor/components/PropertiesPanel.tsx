@@ -54,7 +54,7 @@ export function PropertiesPanel({
               </select>
             </label>
           )}
-          {node.type === 'Card' && (
+          {['Card', 'Inventory'].includes(node.type) && (
             <label>
               Título
               <input

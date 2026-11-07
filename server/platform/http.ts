@@ -1,3 +1,4 @@
+import { InventoryStore } from './inventory.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { z } from 'zod';
@@ -12,6 +13,7 @@ import { randomUUID } from 'node:crypto';
 
 export function createPlatform(store: PlatformStore) {
   const auth = new PlatformAuth(store);
+  const inventory = new InventoryStore(store);
 
   return async (
     req: IncomingMessage,
@@ -82,7 +84,19 @@ export function createPlatform(store: PlatformStore) {
       const runtime = /^\/runtime\/projects\/([^/]+)\/(pages\/by-path|navigation)$/.exec(path);
 
       if (runtime && method === 'GET') {
-        const p = store.access(runtime[1], userId);
+        let p = store.projects(userId).find((p) => p.id === runtime[1]);
+        if (p) {
+          store.access(p.id, userId);
+        } else {
+          inventory.access(runtime[1], userId);
+          const app =
+            inventory.applications(userId).find((p) => p.id === runtime[1]) ??
+            fail(404, 'Proyecto no encontrado');
+          const organization = store.db
+            .prepare('SELECT organization_id FROM projects WHERE id=?')
+            .get(app.id) as { organization_id: string };
+          p = { ...app, organizationId: organization.organization_id, role: 'reader' };
+        }
 
         if (runtime[2] === 'pages/by-path')
           send(200, store.published(p.id, url.searchParams.get('path') ?? '/'));
@@ -111,6 +125,94 @@ export function createPlatform(store: PlatformStore) {
       const projectId = match[1],
         rest = match[2] ?? '';
 
+      if (rest.startsWith('application/')) {
+        store.access(projectId, userId, false, true);
+        if (rest === 'application/members' && method === 'GET') {
+          send(200, inventory.members(projectId, userId));
+          return true;
+        }
+        const member = /^application\/members\/([^/]+)$/.exec(rest);
+        if (member && method === 'PUT') {
+          send(200, inventory.setRole(projectId, userId, member[1], await readBody()));
+          return true;
+        }
+        if (rest === 'application/invitations' && method === 'POST') {
+          send(201, inventory.invite(projectId, userId, await readBody()));
+          return true;
+        }
+        const invitation = /^application\/invitations\/([^/]+)$/.exec(rest);
+        if (invitation && method === 'DELETE') {
+          store.db
+            .prepare('DELETE FROM application_invitations WHERE id=? AND project_id=?')
+            .run(invitation[1], projectId);
+          store.audit(projectId, userId, 'application.invite.cancel', invitation[1]);
+          send(204);
+          return true;
+        }
+        fail(404, 'Endpoint no encontrado');
+      }
+      if (rest.startsWith('inventory/')) {
+        if (rest === 'inventory/config') {
+          store.access(projectId, userId);
+          if (method === 'GET') {
+            send(200, inventory.config(projectId));
+            return true;
+          }
+          if (method === 'POST') {
+            send(201, inventory.configure(projectId, userId, await readBody()));
+            return true;
+          }
+        }
+        if (rest === 'inventory/operations' && method === 'GET') {
+          if (store.projects(userId).some((p) => p.id === projectId))
+            store.access(projectId, userId);
+          else inventory.access(projectId, userId);
+          send(200, inventory.operations(projectId));
+          return true;
+        }
+        inventory.access(projectId, userId);
+        if (rest === 'inventory/access' && method === 'GET') {
+          send(200, { role: inventory.access(projectId, userId), userId });
+          return true;
+        }
+        if (rest === 'inventory/stock' && method === 'GET') {
+          send(200, inventory.stock(projectId, url.searchParams));
+          return true;
+        }
+        if (rest === 'inventory/movements') {
+          if (method === 'GET') {
+            send(200, inventory.history(projectId, url.searchParams));
+            return true;
+          }
+          if (method === 'POST') {
+            const result = inventory.move(projectId, userId, await readBody());
+            send(result.replayed ? 200 : 201, result);
+            return true;
+          }
+        }
+        const product = /^inventory\/products\/([^/]+)\/(minimum|status)$/.exec(rest);
+        if (product && method === 'PUT') {
+          send(
+            200,
+            product[2] === 'minimum'
+              ? inventory.minimum(projectId, userId, product[1], await readBody())
+              : inventory.setActive(projectId, userId, product[1], await readBody()),
+          );
+          return true;
+        }
+        if (rest === 'inventory/actors' && method === 'GET') {
+          send(
+            200,
+            store.db
+              .prepare(
+                'SELECT DISTINCT u.id,u.name FROM inventory_movements m JOIN users u ON u.id=m.actor_id WHERE m.project_id=? ORDER BY u.name',
+              )
+              .all(projectId),
+          );
+          return true;
+        }
+        fail(404, 'Endpoint no encontrado');
+      }
       const restoring = rest === '' && method === 'PATCH';
 
       const project = restoring
@@ -257,6 +359,10 @@ export function createPlatform(store: PlatformStore) {
         }
 
         if (method === 'DELETE' && id) {
+          const config = store.db
+            .prepare('SELECT entity_id FROM inventory_config WHERE project_id=?')
+            .get(projectId) as { entity_id: string } | undefined;
+          if (config?.entity_id === entityId) inventory.access(projectId, userId, 'admin');
           const revision = z.coerce.number().int().min(1).parse(url.searchParams.get('revision'));
           store.deactivateRecord(projectId, entityId, id, revision, userId);
           send(204);

@@ -1,3 +1,4 @@
+import { WorkspaceInventory } from './WorkspaceInventory';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { Database, FileText, Users, Workflow, Layers, LogOut } from 'lucide-react';
 import { WorkspaceGate, useWorkspace } from './WorkspaceContext';
@@ -50,6 +51,7 @@ function WorkspaceShell() {
             { to: 'pages', label: 'Páginas', Icon: FileText },
             { to: 'data', label: 'Datos', Icon: Database },
             { to: 'services', label: 'Servicios', Icon: Workflow },
+            { to: 'inventory', label: 'Inventario', Icon: Database },
             { to: 'team', label: 'Equipo y proyecto', Icon: Users },
           ].map(({ to, label, Icon }) => (
             <NavLink key={to} to={'/workspace/' + to}>
@@ -94,6 +96,7 @@ function WorkspaceShell() {
             <Route index element={<Navigate to="pages" replace />} />
             <Route path="pages" element={<WorkspacePages />} />
             <Route path="data" element={<WorkspaceData />} />
+            <Route path="inventory" element={<WorkspaceInventory />} />
             <Route path="services" element={<WorkspaceServices />} />
             <Route path="team" element={<WorkspaceTeam />} />
             <Route path="*" element={<Navigate to="/workspace/pages" replace />} />

@@ -11,7 +11,7 @@ Base de requisitos: catálogo RF de inventario v1 elaborado con el equipo; inves
 1. Se elimina la sincronización bidireccional con código. El árbol JSON es el contrato entre Design y Runtime; no se reconstruyen cambios externos sobre el editor.
 2. Cada organización tiene un único proyecto, restricción también en base de datos. Un usuario puede participar en organizaciones distintas mediante invitación.
 3. Cantidades e importes usan enteros seguros. Moneda PEN: 1050 centavos se presentan como S/ 10.50. No hay redondeo automático ni aceptación de más de dos decimales. Los límites de los campos monetarios se configuran en centavos.
-4. Solo el propietario publica, gestiona acceso y archiva/restaura. Editor: diseño, borradores, entidades y registros. Lector: consulta. Estos son roles de construcción; los roles operativos de la aplicación llegarán después.
+4. Solo el propietario publica, gestiona acceso y archiva/restaura. Editor: diseño, borradores, entidades y registros. Lector: consulta. Estos son roles de construcción; E2 añade permisos operativos independientes.
 5. Base estable para el piloto: SQLite con WAL, claves foráneas y transacciones, sesiones en servidor, aislamiento por proyecto, revisiones optimistas, instantánea publicada, desactivación de registros, registro de acciones y copia verificada mediante la API de backup de SQLite. Un único proceso de backend.
 6. Figma e IA quedan fuera del alcance. No se crean integraciones para ninguno.
 
@@ -26,7 +26,7 @@ Base de requisitos: catálogo RF de inventario v1 elaborado con el equipo; inves
 | B15–B16    | Guardado de borrador separado de publicación, publicación exclusiva del propietario, conservación de versión publicada y rechazo de revisiones obsoletas. Validación de componentes y entidades al publicar.                                                                             |
 | I01–I02    | Plantilla inicial atómica de categorías, unidades y productos; SKU único, relaciones y precio en centavos. Catálogos y productos se administran mediante los mismos servicios.                                                                                                           |
 
-No se afirma cobertura completa de todos los RF: el control fino por campo, acciones visuales libres, roles operativos y futuras extensiones todavía requieren trabajo.
+No se afirma cobertura completa de todos los RF: el control fino por campo, las acciones visuales libres y futuras extensiones todavía requieren trabajo. E2 añade los permisos operativos específicos del inventario.
 
 ## Criterios de aceptación de esta entrega
 
@@ -39,9 +39,12 @@ No se afirma cobertura completa de todos los RF: el control fino por campo, acci
 - La copia de seguridad abre correctamente y conserva usuarios, entidades, borradores y publicaciones.
 - Se preservan los archivos JSON anteriores. No se atribuyen datos preexistentes a una organización sin una migración explícita posterior.
 
+## E2 · Inventario operativo implementado
+
+Entradas, salidas y ajustes con transacciones, enteros, saldo no negativo, idempotencia, historial inmutable, mínimos y permisos operativos independientes. Se puede publicar el componente Inventory y usar la aplicación sin acceso de construcción. Véase [alcance, operación y compatibilidad](inventory-operations.md). RF-B28 está cubierto por servicios transaccionales predeterminados; la composición libre de pasos continúa pendiente.
+
 ## Próximas entregas en orden
 
-1. **E2 · Inventario operativo:** entradas, salidas y ajustes con operaciones atómicas; stock calculado desde movimientos; idempotencia, permisos operativos, historial de movimientos y mínimos. No agregar un campo de stock editable libremente.
 2. **E3 · Servicios e integraciones:** operaciones declarativas con varias entidades, secretos en backend, ambientes, contratos versionados, análisis de impacto y reversión de publicaciones. Migración de datos anteriores mediante una herramienta explícita y comprobable.
 3. **E4 · Reglas y flujos:** condiciones, fórmulas con enteros y escala explícita, aprobaciones y componentes avanzados para desarrolladores.
 4. **E5 · Equipo:** presencia y edición simultánea con resolución de conflictos, comentarios, historial recuperable y módulos reutilizables.
@@ -49,6 +52,6 @@ No se afirma cobertura completa de todos los RF: el control fino por campo, acci
 
 ## Límites conocidos del piloto
 
-Hasta 50 entidades por proyecto, 30 campos por entidad, 5000 registros por entidad y 100 páginas por proyecto. Los listados filtran y ordenan dentro del proceso; no es una solución de gran volumen. No hay envío automático de correo, verificación de correo ni recuperación de contraseña. El registro se usa en un piloto controlado. No hay ejecución de código libre, tareas programadas de negocio, transacciones compuestas configurables, alta disponibilidad ni separación de usuarios finales y constructores.
+Hasta 50 entidades por proyecto, 30 campos por entidad, 5000 registros por entidad y 100 páginas por proyecto. Los listados filtran y ordenan dentro del proceso; no es una solución de gran volumen. No hay envío automático de correo, verificación de correo ni recuperación de contraseña. El registro se usa en un piloto controlado. No hay ejecución de código libre, tareas programadas de negocio, transacciones compuestas configurables ni alta disponibilidad. Los permisos de aplicación actuales cubren inventario; los permisos genéricos por servicio/campo siguen pendientes.
 
 El backend autoriza el acceso en cada solicitud; ocultar controles no es la medida de seguridad. No se debe habilitar la API legacy en un entorno compartido. Para una siguiente apertura pública hacen falta verificación de identidad/correo, recuperación de cuenta, operación administrada y una revisión de seguridad de despliegue.

@@ -36,3 +36,7 @@ La prueba automatizada crea una base temporal, escribe y publica, realiza backup
 Los JSON antiguos siguen en sus rutas originales. No hay importación automática ni pérdida de datos. La API anterior solo se habilita expresamente para consultar el modo local histórico, que carece de permisos por organización. La migración a la base nueva requiere identificar al propietario y al proyecto, revisar un ensayo y ejecutar una importación transaccional; esa herramienta está pendiente.
 
 La versión inicial del esquema SQLite es 1. Los identificadores y tipos de campos no pueden eliminarse o cambiarse desde el piloto. Si una entidad está incluida en una publicación, se bloquean cambios a sus campos para mantener su contrato. En E3 se incorporarán evolución de esquemas, análisis de impacto y reversión sin retirar páginas.
+
+## Extensión de inventario E2
+
+El nuevo backend agrega las tablas operativas al abrir una base E1, sin reescribir sus registros. El inventario se conecta explícitamente y comienza con saldo cero. Antes de actualizar una base compartida, generar una copia verificada. Para volver a E1, detener las escrituras y conservar las tablas nuevas; no eliminarlas ni descartar movimientos posteriores a la copia. [Operación, servicios y compatibilidad de inventario](inventory-operations.md).

@@ -1,3 +1,4 @@
+import { ApplicationTeam } from './ApplicationTeam';
 import { useCallback, useEffect, useState } from 'react';
 import type { Member } from '../../models/data';
 import { platformRequest } from '../../services/platformHttp';
@@ -7,7 +8,7 @@ interface Team {
   invitations: { id: string; email: string; role: string; expiresAt: number }[];
 }
 export function WorkspaceTeam() {
-  const { project, refresh } = useWorkspace();
+  const { project, refresh, session } = useWorkspace();
   const [team, setTeam] = useState<Team>();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -87,6 +88,13 @@ export function WorkspaceTeam() {
           </table>
         </div>
       </section>
+      {owner && (
+        <ApplicationTeam
+          projectId={project.id}
+          ownerId={session.user.id}
+          builders={team?.members ?? []}
+        />
+      )}
       {owner && (
         <section className="workspace-section">
           <h2>Invitar a una persona</h2>

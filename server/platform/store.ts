@@ -1,3 +1,4 @@
+import { initializeInventory } from './inventorySchema.ts';
 import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -81,6 +82,12 @@ export class PlatformStore {
       version: number;
     };
     if (version.version !== 1) throw new Error('Versión de base de datos incompatible');
+    try {
+      initializeInventory(this.db);
+    } catch (error) {
+      this.db.close();
+      throw error;
+    }
   }
   close() {
     this.db.close();
@@ -145,6 +152,22 @@ export class PlatformStore {
           if (field.type === 'relation' && !entities.some((e) => e.id === field.relationEntityId))
             fail(400, 'La entidad relacionada no pertenece a este proyecto');
         if (existing) {
+          const configured = this.db
+            .prepare('SELECT definition FROM inventory_config WHERE project_id=? AND entity_id=?')
+            .get(projectId, id) as { definition: string } | undefined;
+          if (configured) {
+            const cfg = JSON.parse(configured.definition);
+            for (const key of [cfg.nameField, cfg.skuField, cfg.unitField].filter(Boolean)) {
+              const old = existing.fields.find((f) => f.key === key);
+              const next = data.fields.find((f) => f.key === key);
+              if (
+                !next ||
+                next.type !== old?.type ||
+                next.relationEntityId !== old.relationEntityId
+              )
+                fail(409, 'El campo está conectado al inventario y debe conservar su definición');
+            }
+          }
           const oldFields = JSON.stringify(existing.fields);
           if (oldFields !== JSON.stringify(data.fields)) {
             for (const row of this.db
@@ -503,9 +526,17 @@ export class PlatformStore {
             'DataForm',
             'DataTable',
             'DataDetail',
+            'Inventory',
           ].includes(n.type)
         )
           fail(400, 'Componente no disponible: ' + n.type);
+        if (n.type === 'Inventory') {
+          const config = this.db
+            .prepare('SELECT entity_id FROM inventory_config WHERE project_id=?')
+            .get(projectId) as { entity_id: string } | undefined;
+          if (!config) fail(400, 'Activa el inventario antes de publicar este componente');
+          add(config.entity_id);
+        }
         if (['DataForm', 'DataTable', 'DataDetail'].includes(n.type)) {
           if (typeof n.props.entityId !== 'string') fail(400, 'Selecciona la entidad de ' + n.type);
           add(n.props.entityId);

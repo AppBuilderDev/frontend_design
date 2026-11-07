@@ -1,3 +1,4 @@
+import { InventoryServices } from './InventoryServices';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWorkspace } from './WorkspaceContext';
@@ -22,6 +23,7 @@ export function WorkspaceServices() {
           Administrar entidades
         </Link>
       </div>
+      <InventoryServices projectId={project.id} />
       {error && (
         <p role="alert" className="alert">
           {error}

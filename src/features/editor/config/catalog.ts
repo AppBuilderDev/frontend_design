@@ -1,4 +1,5 @@
 export const defaults: Record<string, Record<string, unknown>> = {
+  Inventory: { title: 'Inventario' },
   DataForm: { entityId: '', action: 'create' },
   DataTable: { entityId: '' },
   DataDetail: { entityId: '' },

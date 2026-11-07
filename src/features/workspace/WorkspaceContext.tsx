@@ -1,3 +1,4 @@
+import { runtimeUrl } from '../../services/api';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { PlatformSession, ProjectAccess } from '../../models/data';
 import { ApiError, platformRequest } from '../../services/platformHttp';
@@ -71,8 +72,21 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
   if (!project)
     return (
       <main className="screen-message">
-        <h1>Sin proyectos disponibles</h1>
-        <p>Pide una invitación al propietario.</p>
+        <h1>{session.applications?.length ? 'Tus aplicaciones' : 'Sin proyectos disponibles'}</h1>
+        {session.applications
+          ?.filter((app) => !app.archived)
+          .map((app) => (
+            <p key={app.id}>
+              <a className="workspace-text-link" href={runtimeUrl + '/p/' + app.id + '/'}>
+                Abrir {app.organization} · {app.name}
+              </a>
+            </p>
+          ))}
+        <p>
+          {session.applications?.length
+            ? 'Tienes acceso a estas aplicaciones. Para construir páginas necesitas una invitación de construcción.'
+            : 'Pide una invitación al propietario.'}
+        </p>
         <button
           onClick={() =>
             void platformRequest('/auth/logout', { method: 'POST' }).then(() => location.reload())

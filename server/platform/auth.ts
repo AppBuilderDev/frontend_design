@@ -1,3 +1,4 @@
+import { InventoryStore } from './inventory.ts';
 import { createHash, randomBytes, randomUUID, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { z } from 'zod';
@@ -33,7 +34,11 @@ export class PlatformAuth {
     const user = this.store.db.prepare('SELECT id,name,email FROM users WHERE id=?').get(userId) as
       Omit<UserRow, 'password'> | undefined;
     return user
-      ? { user, projects: this.store.projects(userId) }
+      ? {
+          user,
+          projects: this.store.projects(userId),
+          applications: new InventoryStore(this.store).applications(userId),
+        }
       : fail(401, 'Inicia sesión para continuar');
   }
   user(req: IncomingMessage): string {
@@ -165,10 +170,17 @@ export class PlatformAuth {
   accept(token: string, userId: string) {
     return this.store.db
       .transaction(() => {
-        const invitation = this.store.db
+        let application = false;
+        let invitation = this.store.db
           .prepare('SELECT * FROM invitations WHERE token_hash=? AND expires_at>?')
           .get(tokenHash(token), Date.now()) as
           { id: string; project_id: string; email: string; role: string } | undefined;
+        if (!invitation) {
+          invitation = this.store.db
+            .prepare('SELECT * FROM application_invitations WHERE token_hash=? AND expires_at>?')
+            .get(tokenHash(token), Date.now()) as typeof invitation;
+          application = !!invitation;
+        }
         if (!invitation) fail(400, 'Invitación inválida o caducada');
         const user = this.session(userId).user;
         if (user.email !== invitation.email) fail(403, 'La invitación está dirigida a otro correo');
@@ -176,12 +188,23 @@ export class PlatformAuth {
           .prepare('SELECT archived FROM projects WHERE id=?')
           .get(invitation.project_id) as { archived: number };
         if (p.archived) fail(409, 'El proyecto está archivado');
-        this.store.db
-          .prepare(
-            "INSERT INTO members VALUES (?,?,?) ON CONFLICT(project_id,user_id) DO UPDATE SET role=excluded.role WHERE members.role<>'owner'",
-          )
-          .run(invitation.project_id, userId, invitation.role);
-        this.store.db.prepare('DELETE FROM invitations WHERE id=?').run(invitation.id);
+        if (application) {
+          this.store.db
+            .prepare(
+              'INSERT INTO application_members VALUES(?,?,?) ON CONFLICT(project_id,user_id) DO UPDATE SET role=excluded.role',
+            )
+            .run(invitation.project_id, userId, invitation.role);
+          this.store.db
+            .prepare('DELETE FROM application_invitations WHERE id=?')
+            .run(invitation.id);
+        } else {
+          this.store.db
+            .prepare(
+              "INSERT INTO members VALUES (?,?,?) ON CONFLICT(project_id,user_id) DO UPDATE SET role=excluded.role WHERE members.role<>'owner'",
+            )
+            .run(invitation.project_id, userId, invitation.role);
+          this.store.db.prepare('DELETE FROM invitations WHERE id=?').run(invitation.id);
+        }
         this.store.audit(invitation.project_id, userId, 'member.accept', userId);
         return this.session(userId);
       })

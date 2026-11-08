@@ -62,6 +62,12 @@ test('conserva arrastre Craft, alineación y espaciado cero en el proyecto priva
       return c && b ? (b.x + b.width / 2 - c.x) / c.width : 0;
     })
     .toBeCloseTo(0.5, 2);
+  await page.getByRole('button', { name: 'Seleccionar capa Button', exact: true }).click();
+  await page.getByLabel('Color de texto', { exact: true }).fill('#e13748');
+  await page.getByLabel('Color de fondo', { exact: true }).fill('#26f24f');
+  await expect(button).toHaveCSS('color', 'rgb(225, 55, 72)');
+  await expect(button).toHaveCSS('background-color', 'rgb(38, 242, 79)');
+  await expect(button.locator('..')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await page.getByRole('button', { name: 'Página · nivel raíz', exact: true }).click();
   const root = page.getByTestId('craft-root');
   await page
@@ -76,6 +82,11 @@ test('conserva arrastre Craft, alineación y espaciado cero en el proyecto priva
   await expect(page.getByRole('status')).toContainText('publicados');
   const runtime = await context.newPage();
   await runtime.goto('http://127.0.0.1:5184/p/' + project + '/distribucion');
+  await expect(runtime.locator('.builder-button')).toHaveCSS('color', 'rgb(225, 55, 72)');
+  await expect(runtime.locator('.builder-button')).toHaveCSS(
+    'background-color',
+    'rgb(38, 242, 79)',
+  );
   await expect(runtime.locator('.builder-container')).toHaveCSS('padding', '0px');
   await expect
     .poll(async () => {

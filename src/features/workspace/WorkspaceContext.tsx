@@ -1,4 +1,5 @@
 import { runtimeUrl } from '../../services/api';
+import { Eye, EyeOff } from 'lucide-react';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { PlatformSession, ProjectAccess } from '../../models/data';
 import { ApiError, platformRequest } from '../../services/platformHttp';
@@ -112,6 +113,7 @@ function AuthScreen({
 }) {
   const invitation = new URLSearchParams(window.location.search).get('invite') ?? '';
   const [register, setRegister] = useState(!!invitation);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(connectionError);
   const [busy, setBusy] = useState(false);
   return (
@@ -188,17 +190,33 @@ function AuthScreen({
             Correo
             <input name="email" type="email" required autoComplete="email" maxLength={200} />
           </label>
-          <label>
-            Contraseña
-            <input
-              name="password"
-              type="password"
-              required
-              minLength={register ? 12 : 1}
-              maxLength={128}
-              autoComplete={register ? 'new-password' : 'current-password'}
-            />
-          </label>
+          <div className="auth-password-field">
+            <label htmlFor="auth-password">Contraseña</label>
+            <div className="auth-password-input">
+              <input
+                id="auth-password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={register ? 12 : 1}
+                maxLength={128}
+                autoComplete={register ? 'new-password' : 'current-password'}
+              />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                aria-controls="auth-password"
+                onClick={() => setShowPassword((visible) => !visible)}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} aria-hidden="true" />
+                ) : (
+                  <Eye size={20} aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
           {register && (
             <small>Al menos 12 caracteres. Nunca guardamos tu contraseña en texto plano.</small>
           )}
@@ -215,6 +233,7 @@ function AuthScreen({
           className="auth-toggle"
           onClick={() => {
             setRegister(!register);
+            setShowPassword(false);
             setError('');
           }}
         >

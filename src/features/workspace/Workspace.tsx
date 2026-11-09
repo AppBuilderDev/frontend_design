@@ -1,6 +1,16 @@
 import { WorkspaceInventory } from './WorkspaceInventory';
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
-import { Database, FileText, Users, Workflow, Layers, LogOut } from 'lucide-react';
+import { Link, NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import {
+  Database,
+  FileText,
+  Users,
+  Workflow,
+  Layers,
+  LogOut,
+  Package,
+  ShieldCheck,
+  CircleHelp,
+} from 'lucide-react';
 import { WorkspaceGate, useWorkspace } from './WorkspaceContext';
 import { WorkspaceData } from './WorkspaceData';
 import { WorkspaceTeam } from './WorkspaceTeam';
@@ -23,10 +33,13 @@ function WorkspaceShell() {
   const { session, project } = useWorkspace();
   return (
     <div className="workspace-shell">
+      <a className="skip-link" href="#workspace-content">
+        Ir al contenido
+      </a>
       <aside className="workspace-nav">
         <NavLink to="/workspace" className="workspace-brand">
           <Layers size={22} />
-          AppBuilderDev
+          AppBuilder<span className="brand-dot">.</span>
         </NavLink>
         <span className="workspace-org">{project.organization}</span>
         <label className="project-switch">
@@ -48,18 +61,24 @@ function WorkspaceShell() {
         </label>
         <nav aria-label="Construcción del proyecto">
           {[
-            { to: 'pages', label: 'Páginas', Icon: FileText },
-            { to: 'data', label: 'Datos', Icon: Database },
-            { to: 'services', label: 'Servicios', Icon: Workflow },
-            { to: 'inventory', label: 'Inventario', Icon: Database },
+            { to: 'pages', label: 'Mis páginas', Icon: FileText },
+            { to: 'data', label: 'Mis datos', Icon: Database },
+            { to: 'services', label: 'Acciones y conexiones', Icon: Workflow },
+            { to: 'inventory', label: 'Inventario', Icon: Package },
             { to: 'team', label: 'Equipo y proyecto', Icon: Users },
           ].map(({ to, label, Icon }) => (
-            <NavLink key={to} to={'/workspace/' + to}>
+            <NavLink key={to} end={to === ''} to={'/workspace/' + to}>
               <Icon size={18} />
               {label}
             </NavLink>
           ))}
         </nav>
+        <Link className="nav-guide" to="/workspace/pages">
+          <CircleHelp size={20} />
+          <span>
+            Tu espacio de trabajo<small>Diseña y administra tus páginas</small>
+          </span>
+        </Link>
         <div className="workspace-account">
           <strong>{session.user.name}</strong>
           <small>
@@ -81,10 +100,12 @@ function WorkspaceShell() {
           </button>
         </div>
       </aside>
-      <div className="workspace-main">
+      <div className="workspace-main" id="workspace-content" tabIndex={-1}>
         <header className="workspace-header">
           <span>{project.name}</span>
-          <small>Un proyecto por organización · Espacio privado</small>
+          <small className="privacy-pill">
+            <ShieldCheck size={14} /> Espacio privado
+          </small>
         </header>
         {project.archived ? (
           <main className="workspace-content">

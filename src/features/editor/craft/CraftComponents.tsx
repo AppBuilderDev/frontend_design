@@ -1,3 +1,4 @@
+import { componentLabels } from '../config/labels';
 import { useEditor, useNode } from '@craftjs/core';
 import { GripVertical, Plus } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -27,7 +28,7 @@ export function CraftRoot({ children }: { children?: ReactNode }) {
           <div className="empty-icon">
             <Plus size={28} />
           </div>
-          <h2>Empieza con un componente</h2>
+          <h2>Añade tu primer elemento</h2>
           <p>
             Arrástralo desde el panel izquierdo hasta aquí.
             <br />
@@ -94,13 +95,13 @@ export function CraftBlock({ nodeId, nodeType, nodeProps, children }: BlockProps
         title="Arrastra para mover este componente"
       >
         <GripVertical size={13} />
-        {nodeType}
+        {componentLabels[nodeType] ?? nodeType}
       </button>
       <div className="node-content">
         <ComponentView node={{ id: nodeId ?? id, type: nodeType, props: nodeProps }}>
           {children}
           {isContainer(nodeType) && empty && (
-            <div className="container-hint">Arrastra componentes aquí</div>
+            <div className="container-hint">Arrastra elementos aquí</div>
           )}
         </ComponentView>
       </div>

@@ -8,12 +8,12 @@ test('organización → inventario → editor → publicación → datos en Runt
   await page.goto('/');
   await page.getByRole('button', { name: 'Crear una cuenta', exact: true }).click();
   await page.getByLabel('Tu nombre', { exact: true }).fill('Carlo prueba');
-  await page.getByLabel('Organización', { exact: true }).fill('Almacén de prueba');
+  await page.getByLabel('Nombre de tu negocio o equipo', { exact: true }).fill('Almacén de prueba');
   await page.getByLabel('Correo', { exact: true }).fill('browser-' + Date.now() + '@example.com');
   await page.getByLabel('Contraseña', { exact: true }).fill('Clave-del-almacen-123');
   await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click();
-  await expect(page.getByRole('link', { name: 'Datos', exact: true })).toBeVisible();
-  await page.getByRole('link', { name: 'Datos', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'Mis datos', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Mis datos', exact: true }).click();
   await page.getByRole('button', { name: 'Comenzar con inventario', exact: true }).click();
   await page.getByRole('button', { name: 'Categorías', exact: true }).click();
   await page.getByLabel('Nombre *', { exact: true }).fill('Alimentos');
@@ -46,22 +46,22 @@ test('organización → inventario → editor → publicación → datos en Runt
   await expect(page.getByRole('status').filter({ hasText: 'Registro guardado' })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'S/ 13.10', exact: true })).toBeVisible();
   await page.screenshot({ path: 'test-results/inventory-workspace.png', fullPage: true });
-  await page.getByRole('link', { name: 'Servicios', exact: true }).click();
+  await page.getByRole('link', { name: 'Acciones y conexiones', exact: true }).click();
   await page.getByRole('button', { name: 'Probar consulta de Productos', exact: true }).click();
   await expect(page.locator('.service-response')).toContainText('1310');
-  await page.getByRole('link', { name: 'Páginas', exact: true }).click();
+  await page.getByRole('link', { name: 'Mis páginas', exact: true }).click();
   await page.getByRole('button', { name: 'Crear página', exact: true }).click();
   await page.getByLabel('Nombre', { exact: true }).fill('Mi inventario');
-  await page.getByLabel('Código', { exact: true }).fill('inventario');
+  await page.getByLabel('Dirección de la página', { exact: true }).fill('inventario');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear página', exact: true }).click();
   await expect(page).toHaveURL(/workspace\/editor/);
-  await page.getByRole('button', { name: 'Heading', exact: true }).click();
-  await page.getByLabel('Texto', { exact: true }).fill('Mi almacén');
-  await page.getByRole('button', { name: 'DataTable', exact: true }).click();
+  await page.getByRole('button', { name: 'Título', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Texto', exact: true }).fill('Mi almacén');
+  await page.getByRole('button', { name: 'Tabla de datos', exact: true }).click();
   await page.getByLabel('Entidad conectada', { exact: true }).selectOption({ label: 'Productos' });
-  await page.getByRole('button', { name: 'DataForm', exact: true }).click();
+  await page.getByRole('button', { name: 'Formulario', exact: true }).click();
   await page.getByLabel('Entidad conectada', { exact: true }).selectOption({ label: 'Productos' });
-  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await page.getByRole('button', { name: 'Guardar borrador', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Borrador guardado');
   const session = await (
     await context.request.get('http://127.0.0.1:5183/api/v1/auth/session')

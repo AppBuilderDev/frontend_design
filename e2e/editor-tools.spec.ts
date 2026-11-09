@@ -34,11 +34,13 @@ test('duplica y copia árboles, navega por padres y respeta los atajos de edici�
     await page.goto(`/editor/${initial.id}`);
     const boxes = page.locator('[data-component-type="Container"]');
     await expect(boxes).toHaveCount(1);
-    await page.getByRole('button', { name: 'Seleccionar capa Container', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Seleccionar elemento Contenedor', exact: true })
+      .click();
     await page.getByRole('button', { name: 'Duplicar componente', exact: true }).click();
     await expect(boxes).toHaveCount(2);
     await boxes.nth(1).locator('[data-component-type="Heading"]').click();
-    const text = page.getByLabel('Texto', { exact: true });
+    const text = page.getByRole('textbox', { name: 'Texto', exact: true });
     await text.fill('Copia independiente');
     // Ctrl+D inside text fields must not duplicate components.
     await text.press('Control+d');
@@ -46,16 +48,16 @@ test('duplica y copia árboles, navega por padres y respeta los atajos de edici�
     await expect(boxes.first().getByRole('heading', { name: 'Título original' })).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Ruta del componente' })
-      .getByRole('button', { name: 'Container', exact: true })
+      .getByRole('button', { name: 'Contenedor', exact: true })
       .click();
     await page.getByRole('button', { name: 'Copiar componente', exact: true }).click();
-    await page.getByRole('button', { name: 'Página · nivel raíz', exact: true }).click();
+    await page.getByRole('button', { name: 'Toda la página', exact: true }).click();
     await page.getByRole('button', { name: 'Pegar componente', exact: true }).click();
     await expect(boxes).toHaveCount(3);
     await expect(boxes.nth(2).getByRole('heading', { name: 'Copia independiente' })).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Ruta del componente' })
-      .getByRole('button', { name: 'Container', exact: true })
+      .getByRole('button', { name: 'Contenedor', exact: true })
       .focus();
     await page.keyboard.press('Control+d');
     await expect(boxes).toHaveCount(4);
@@ -72,7 +74,7 @@ test('duplica y copia árboles, navega por padres y respeta los atajos de edici�
     await expect(
       page
         .getByRole('navigation', { name: 'Ruta del componente' })
-        .getByRole('button', { name: 'Heading', exact: true }),
+        .getByRole('button', { name: 'Título', exact: true }),
     ).toHaveCount(0);
     await page.keyboard.press('Control+s');
     await expect(
@@ -103,7 +105,7 @@ test('guarda bloques en el backend y los reutiliza en otra página con estilos p
   page.on('pageerror', (error) => errors.push(error.message));
   try {
     await page.goto(`/editor/${source.id}`);
-    await page.getByRole('tab', { name: 'Bloques', exact: true }).click();
+    await page.getByRole('button', { name: 'Ver secciones', exact: true }).click();
     await page.getByRole('button', { name: 'Insertar bloque Presentación', exact: true }).click();
     const container = page.locator('[data-component-type="Container"]');
     await expect(container).toHaveCount(1);
@@ -140,11 +142,11 @@ test('guarda bloques en el backend y los reutiliza en otra página con estilos p
     const original = blocks.find((block: { id: string }) => block.id === blockId);
     page.on('dialog', (dialog) => void dialog.accept());
     await page.goto(`/editor/${target.id}`);
-    await page.getByRole('tab', { name: 'Bloques', exact: true }).click();
+    await page.getByRole('button', { name: 'Ver secciones', exact: true }).click();
     await page.getByRole('button', { name: 'Insertar bloque ' + blockName, exact: true }).click();
     await expect(container).toHaveCount(1);
     await container.locator('[data-component-type="Heading"]').click();
-    await page.getByLabel('Texto', { exact: true }).fill('Bloque reutilizado');
+    await page.getByRole('textbox', { name: 'Texto', exact: true }).fill('Bloque reutilizado');
     await page.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(
       page.getByText('Cambios guardados y publicados. Ya están disponibles en Runtime.'),
@@ -193,7 +195,7 @@ test('resalta el destino y desplaza el lienzo mientras se mantiene un arrastre e
   try {
     await page.goto(`/editor/${initial.id}`);
     const canvas = page.getByRole('main');
-    const source = page.getByRole('button', { name: 'Paragraph', exact: true });
+    const source = page.getByRole('button', { name: 'Texto', exact: true });
     await source.hover();
     const bounds = await canvas.boundingBox();
     if (!bounds) throw new Error('Lienzo sin dimensiones');

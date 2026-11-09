@@ -35,13 +35,14 @@ export function WorkspaceData() {
     <main className="workspace-content">
       <div className="workspace-heading">
         <div>
-          <h1>Datos</h1>
-          <p>Define lo que tu aplicación necesita guardar.</p>
+          <span className="eyebrow">LA INFORMACIÓN DE TU NEGOCIO</span>
+          <h1>Mis datos</h1>
+          <p>Organiza tu información en listas, como productos, clientes o categorías.</p>
         </div>
         {project.role !== 'reader' && (
           <button className="primary" onClick={() => setEditing(null)}>
             <Plus size={16} />
-            Crear entidad
+            Crear lista de datos
           </button>
         )}
       </div>
@@ -51,14 +52,14 @@ export function WorkspaceData() {
         </p>
       )}
       {loading ? (
-        <p role="status">Cargando entidades…</p>
+        <p role="status">Cargando tus listas…</p>
       ) : !entities.length ? (
         <section className="workspace-empty">
           <Database size={30} />
           <h2>Empieza por tus datos</h2>
           <p>
-            Una entidad puede representar productos, categorías o clientes. Sus campos definirán los
-            formularios y servicios.
+            Piensa en una hoja de cálculo: cada lista guarda un tipo de información y cada campo es
+            una columna. Puedes empezar con una plantilla de inventario.
           </p>
           {project.role !== 'reader' && (
             <button
@@ -169,10 +170,12 @@ function EntityDialog({
         aria-modal="true"
         aria-labelledby="entity-dialog-title"
       >
-        <h2 id="entity-dialog-title">{entity ? 'Editar entidad' : 'Crear entidad'}</h2>
+        <h2 id="entity-dialog-title">
+          {entity ? 'Editar lista de datos' : 'Crear lista de datos'}
+        </h2>
         <p>
-          Los servicios de datos se crean automáticamente. Los identificadores y tipos de campos
-          guardados se conservan.
+          Cada campo es una columna: por ejemplo, nombre, precio o categoría. Elige qué información
+          necesitas guardar. Los identificadores y tipos guardados se conservan.
         </p>
         <form
           onSubmit={async (event) => {
@@ -198,7 +201,7 @@ function EntityDialog({
         >
           <div className="inspector-grid">
             <label>
-              Nombre de la entidad
+              Nombre de la lista
               <input
                 required
                 maxLength={80}
@@ -211,7 +214,7 @@ function EntityDialog({
               />
             </label>
             <label>
-              Identificador de entidad
+              Identificador de la lista
               <input
                 required
                 value={key}
@@ -359,14 +362,14 @@ function EntityDialog({
                     )}
                     {f.type === 'relation' && (
                       <label>
-                        Entidad relacionada
+                        Lista relacionada
                         <select
-                          aria-label={'Entidad relacionada del campo ' + (index + 1)}
+                          aria-label={'Lista relacionada del campo ' + (index + 1)}
                           required
                           value={f.relationEntityId ?? ''}
                           onChange={(e) => change(index, { relationEntityId: e.target.value })}
                         >
-                          <option value="">Seleccionar entidad</option>
+                          <option value="">Seleccionar lista</option>
                           {entities
                             .filter((e) => e.id !== entity?.id)
                             .map((e) => (
@@ -418,7 +421,7 @@ function EntityDialog({
               Cancelar
             </button>
             <button className="primary" disabled={busy}>
-              {busy ? 'Guardando…' : 'Guardar entidad'}
+              {busy ? 'Guardando…' : 'Guardar lista'}
             </button>
           </div>
         </form>

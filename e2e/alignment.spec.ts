@@ -37,7 +37,9 @@ test('posiciona botones independientemente de la alineación del texto en editor
     const button = page.locator('.builder-button:visible');
     // Reproduce the configuration in the reported screenshot.
     await expect.poll(() => horizontalPosition(container, button)).toBeGreaterThan(0.6);
-    await page.getByRole('button', { name: 'Seleccionar capa Container', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Seleccionar elemento Contenedor', exact: true })
+      .click();
     await expect(page.getByLabel('Alineación del texto', { exact: true })).toHaveValue('center');
     for (const layout of ['column', 'row', 'grid']) {
       if (layout === 'grid') {
@@ -77,7 +79,7 @@ test('posiciona botones independientemente de la alineación del texto en editor
       )
       .toBeCloseTo(0.5, 2);
     // A child can also explicitly return to inherited text alignment.
-    await page.getByRole('button', { name: 'Seleccionar capa Button', exact: true }).click();
+    await page.getByRole('button', { name: 'Seleccionar elemento Botón', exact: true }).click();
     await page.getByLabel('Alineación del texto', { exact: true }).selectOption('');
     await expect(page.locator('[data-component-id="button"] .node-content > div')).toHaveCSS(
       'text-align',
@@ -122,7 +124,9 @@ test('padding cero elimina el espacio real y el editor coincide con la página p
   };
   try {
     await page.goto('/editor/' + initial.id);
-    await page.getByRole('button', { name: 'Seleccionar capa Container', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Seleccionar elemento Contenedor', exact: true })
+      .click();
     const container = page.locator('.builder-container:visible');
     const button = page.locator('.builder-button:visible');
     await page.getByLabel('Espaciado interior', { exact: true }).fill('0');

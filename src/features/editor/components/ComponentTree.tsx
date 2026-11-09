@@ -1,3 +1,4 @@
+import { componentLabels } from '../config/labels';
 import { useEditor } from '@craftjs/core';
 import { GripVertical } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -24,11 +25,11 @@ export function ComponentTree({
               if (el) connectors.drag(connectors.select(el, id), id);
             }}
             className={'tree-row ' + (selected === id ? 'active' : '')}
-            aria-label={'Seleccionar capa ' + node.type}
+            aria-label={'Seleccionar elemento ' + (componentLabels[node.type] ?? node.type)}
             onClick={() => actions.selectNode(id)}
           >
             <GripVertical size={13} />
-            <span>{node.type}</span>
+            <span>{componentLabels[node.type] ?? node.type}</span>
             <small>{typeof node.props.text === 'string' ? node.props.text.slice(0, 16) : ''}</small>
           </button>
           {node.children && <div className="tree-children">{tree(node.children)}</div>}
@@ -39,11 +40,11 @@ export function ComponentTree({
   return (
     <>
       <button className="root-select" onClick={() => actions.selectNode(ROOT)}>
-        Página · nivel raíz
+        Toda la página
       </button>
       <div className="tree">
         {tree(nodes)}
-        {!nodes.length && <p className="panel-help">Sin componentes.</p>}
+        {!nodes.length && <p className="panel-help">Añade tu primer elemento desde arriba.</p>}
       </div>
     </>
   );

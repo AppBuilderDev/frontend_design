@@ -10,8 +10,12 @@ export function WorkspacePages() {
     <main className="workspace-content">
       <div className="workspace-heading">
         <div>
-          <h1>Páginas</h1>
-          <p>Diseña con datos reales. Guardar conserva el borrador; solo el propietario publica.</p>
+          <span className="eyebrow">DISEÑA Y COMPARTE</span>
+          <h1>Mis páginas</h1>
+          <p>
+            Cada página es una pantalla de tu aplicación. Diseña, revisa y publica cuando esté
+            lista.
+          </p>
         </div>
         {project.role !== 'reader' && (
           <button
@@ -31,6 +35,10 @@ export function WorkspacePages() {
           <button onClick={() => void state.load()}>Reintentar</button>
         </p>
       )}
+      <div className="context-tip">
+        <strong>Tu trabajo, a tu ritmo.</strong> Guardar conserva tus cambios como borrador.
+        Publicar los hace visibles para tu equipo.
+      </div>
       <PageTable
         pages={state.pages}
         loading={state.loading}

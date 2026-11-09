@@ -138,12 +138,12 @@ test('diseña cuatro pasos, simula sin cambios y ejecuta versiones desde Runtime
     .getByRole('button', { name: 'Publicar servicio Reservar capacidad', exact: true })
     .click();
   await expect(page.getByText('Versión predeterminada 1', { exact: true })).toBeVisible();
-  await page.getByRole('link', { name: 'Páginas', exact: true }).click();
+  await page.getByRole('link', { name: 'Mis páginas', exact: true }).click();
   await page.getByRole('button', { name: 'Crear página', exact: true }).click();
   await page.getByLabel('Nombre', { exact: true }).fill('Reserva de cajas');
-  await page.getByLabel('Código', { exact: true }).fill('reservar');
+  await page.getByLabel('Dirección de la página', { exact: true }).fill('reservar');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear página', exact: true }).click();
-  await page.getByRole('button', { name: 'ServiceForm', exact: true }).click();
+  await page.getByRole('button', { name: 'Formulario de acción', exact: true }).click();
   await page
     .getByRole('combobox', { name: 'Servicio conectado', exact: true })
     .selectOption(operation.id);
@@ -198,7 +198,7 @@ test('diseña cuatro pasos, simula sin cambios y ejecuta versiones desde Runtime
     (await (await context.request.get(root + '/services/' + logs.id + '/records')).json()).total,
   ).toBe(2);
   await page.getByRole('link', { name: 'Volver a páginas', exact: true }).click();
-  await page.getByRole('link', { name: 'Servicios', exact: true }).click();
+  await page.getByRole('link', { name: 'Acciones y conexiones', exact: true }).click();
   await page
     .getByRole('button', { name: 'Editar servicio Reservar capacidad', exact: true })
     .click();

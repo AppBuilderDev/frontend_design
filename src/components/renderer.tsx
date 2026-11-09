@@ -48,11 +48,11 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
   Heading: ({ node }) => {
     const text = str(node.props.text, 'Un gran título');
     return node.props.level === 'h1' ? (
-      <h1>{text}</h1>
+      <h1 style={textStyle(node.props)}>{text}</h1>
     ) : node.props.level === 'h3' ? (
-      <h3>{text}</h3>
+      <h3 style={textStyle(node.props)}>{text}</h3>
     ) : (
-      <h2>{text}</h2>
+      <h2 style={textStyle(node.props)}>{text}</h2>
     );
   },
   Paragraph: ({ node }) => <p>{str(node.props.text, 'Escribe aquí tu contenido.')}</p>,
@@ -65,11 +65,15 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
     const { color, backgroundColor } = style(node.props);
     const colors = { color, backgroundColor };
     return safe ? (
-      <a className="builder-button" href={href} style={colors}>
+      <a className="builder-button" href={href} style={{ ...textStyle(node.props), ...colors }}>
         {str(node.props.text, 'Continuar')}
       </a>
     ) : (
-      <button type="button" className="builder-button" style={colors}>
+      <button
+        type="button"
+        className="builder-button"
+        style={{ ...textStyle(node.props), ...colors }}
+      >
         {str(node.props.text, 'Continuar')}
       </button>
     );
@@ -100,6 +104,9 @@ function style(props: Record<string, unknown>, includePadding = true): CSSProper
     'margin',
     'borderRadius',
     'fontSize',
+    'fontWeight',
+    'fontStyle',
+    'textDecoration',
     'textAlign',
     'maxWidth',
     'paddingTop',
@@ -130,6 +137,15 @@ function style(props: Record<string, unknown>, includePadding = true): CSSProper
   }
   if (!includePadding) paddingKeys.forEach((key) => delete s[key]);
   return s;
+}
+function textStyle(props: Record<string, unknown>): CSSProperties {
+  const safe = style(props);
+  return {
+    fontSize: safe.fontSize,
+    fontWeight: safe.fontWeight,
+    fontStyle: safe.fontStyle,
+    textDecoration: safe.textDecoration,
+  };
 }
 function spacingParts(value: string): string[] {
   const parts: string[] = [];

@@ -27,15 +27,17 @@ test('conserva e informa cambios locales realizados mientras se guarda', async (
   });
   try {
     await page.goto('/editor/' + initial.id);
-    await page.getByRole('button', { name: 'Seleccionar capa Heading', exact: true }).click();
+    await page.getByRole('button', { name: 'Seleccionar elemento Título', exact: true }).click();
     await page.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Guardando…', exact: true })).toBeDisabled();
-    await page.getByLabel('Texto', { exact: true }).fill('Cambio posterior al envío');
+    await page
+      .getByRole('textbox', { name: 'Texto', exact: true })
+      .fill('Cambio posterior al envío');
     release();
     await expect(
       page.getByText('Guardado. Tienes cambios locales pendientes adicionales.'),
     ).toBeVisible();
-    await expect(page.getByLabel('Texto', { exact: true })).toHaveValue(
+    await expect(page.getByRole('textbox', { name: 'Texto', exact: true })).toHaveValue(
       'Cambio posterior al envío',
     );
     await expect(page.getByRole('contentinfo')).toContainText('Cambios pendientes');

@@ -1,3 +1,4 @@
+import { runtimeUrl } from '../../../services/api';
 import { getProjectScope } from '../../../services/projectScope';
 import { Link } from 'react-router-dom';
 import { Files, Search, ArrowUpRight, Pencil, Trash2 } from 'lucide-react';
@@ -33,7 +34,7 @@ export function PageTable({
           <Search size={17} />
           <input
             aria-label="Buscar páginas"
-            placeholder="Buscar por nombre o código..."
+            placeholder="Busca una página…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -50,7 +51,7 @@ export function PageTable({
               <thead>
                 <tr>
                   <th>Nombre de página</th>
-                  <th>Ruta pública</th>
+                  <th>Dirección de la página</th>
                   <th>Estado</th>
                   <th>Última actualización</th>
                   <th>Acciones</th>
@@ -75,7 +76,21 @@ export function PageTable({
                         </Link>
                       </td>
                       <td>
-                        <code>/{page.code}</code>
+                        <a
+                          className="published-route"
+                          href={
+                            runtimeUrl +
+                            (getProjectScope() ? '/p/' + getProjectScope()!.id : '') +
+                            '/' +
+                            page.code
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Abrir la página publicada; si es nueva, publícala primero"
+                        >
+                          <code>/{page.code}</code>
+                          <ArrowUpRight size={13} />
+                        </a>
                       </td>
                       <td>
                         <span className={'badge ' + page.status}>
@@ -126,7 +141,7 @@ export function PageTable({
               <h3>{query ? 'No hay resultados' : 'Tu próxima idea empieza aquí'}</h3>
               <p>
                 {query
-                  ? 'Prueba con otro nombre o código.'
+                  ? 'Prueba con otro nombre o dirección.'
                   : 'Crea tu primera página y dale forma en el editor visual.'}
               </p>
               {!query && !readOnly && (
@@ -142,7 +157,7 @@ export function PageTable({
         {pages.length} páginas en tu proyecto
         <span>
           {getProjectScope()
-            ? 'Guardar conserva borradores. Solo el propietario publica.'
+            ? 'Guardar conserva borradores. El propietario puede publicar para el equipo.'
             : 'Al guardar, los cambios se hacen públicos.'}
         </span>
       </footer>

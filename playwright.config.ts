@@ -5,7 +5,8 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:5173', headless: true },
   webServer: [
     {
-      command: 'npm run api',
+      command: 'npm run dev',
+      cwd: '../backend',
       env: { ENABLE_LEGACY_API: '1' },
       url: 'http://127.0.0.1:3001/api/pages',
       reuseExistingServer: !process.env.CI,

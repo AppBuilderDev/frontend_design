@@ -2,14 +2,10 @@ node_modules/
 dist/
 .env
 *.tsbuildinfo
-server/data/*.json
 playwright-report/
 test-results/
 
-server/data/*.tmp
 
-server/data/*.sqlite*
-server/data/backups/
 
-.env.connector-*.tmp
-.env.connector.lock
+
+artifacts/

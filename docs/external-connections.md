@@ -104,4 +104,4 @@ El recorrido de navegador emplea un proveedor determinista mediante un lanzador 
 
 Referencias primarias utilizadas para implementar el transporte y cifrado: [HTTPS en Node](https://nodejs.org/download/release/v24.18.0/docs/api/https.html), [conexión TCP y selección de familia](https://nodejs.org/download/release/v24.18.0/docs/api/net.html), [cifrado autenticado de Node](https://nodejs.org/download/release/v24.18.0/docs/api/crypto.html).
 
-Siguiente bloque pendiente de E3: importación explícita y revisable de los datos anteriores. También quedan pendientes ambientes completos con datos/despliegues separados y conectores de escritura con una estrategia propia de consistencia. IA, Figma y sincronización bidireccional siguen fuera de alcance.
+Siguiente bloque pendiente de E3: importación explícita y revisable de los datos anteriores. También quedan pendientes ambientes completos con datos/despliegues separados y conectores de escritura con una estrategia propia de consistencia. IA y Figma siguen fuera; la sincronizacion del subconjunto TSX v1 se incorpora en la etapa actual.

@@ -2,13 +2,13 @@
 
 ## Alcance
 
-AppBuilderDev será un constructor visual de aplicaciones internas para usuarios de negocio, con capacidades progresivas para desarrolladores. El inventario es la primera aplicación de referencia. Se trabaja en los dos repositorios existentes y en la rama `build/inventario`, sin publicar cambios en main.
+AppBuilderDev será un constructor visual de aplicaciones internas para usuarios de negocio, con capacidades progresivas para desarrolladores. El inventario es la primera aplicación de referencia. Se trabaja en tres repositorios independientes: frontend_design, frontend_runtime y backend. Esta entrega deja los cambios locales sin commit ni push.
 
 Base de requisitos: catálogo RF de inventario v1 elaborado con el equipo; investigación A.5_HITO1 y TAIS Segunda Unidad. Las decisiones posteriores del propietario sustituyen las propuestas anteriores que entren en conflicto.
 
 ## Decisiones vigentes
 
-1. Se elimina la sincronización bidireccional con código. El árbol JSON es el contrato entre Design y Runtime; no se reconstruyen cambios externos sobre el editor.
+1. Se incorpora sincronizacion bidireccional para el subconjunto TSX v1 documentado en contract.md. El arbol JSON sigue siendo el contrato de persistencia y Runtime; React arbitrario continua fuera del alcance.
 2. Cada organización tiene un único proyecto, restricción también en base de datos. Un usuario puede participar en organizaciones distintas mediante invitación.
 3. Cantidades e importes usan enteros seguros. Moneda PEN: 1050 centavos se presentan como S/ 10.50. No hay redondeo automático ni aceptación de más de dos decimales. Los límites de los campos monetarios se configuran en centavos.
 4. Solo el propietario publica, gestiona acceso y archiva/restaura. Editor: diseño, borradores, entidades y registros. Lector: consulta. Estos son roles de construcción; E2 añade permisos operativos independientes.
@@ -63,3 +63,7 @@ Conexiones GET HTTPS con entradas tipadas y proyección de respuestas, pruebas/p
 Hasta 50 entidades por proyecto, 30 campos por entidad, 5000 registros por entidad y 100 páginas por proyecto. Los listados filtran y ordenan dentro del proceso; no es una solución de gran volumen. No hay envío automático de correo, verificación de correo ni recuperación de contraseña. El registro se usa en un piloto controlado. No hay ejecución de código libre, tareas programadas de negocio, flujos con ramificaciones ni alta disponibilidad. Los permisos de aplicación cubren inventario y ejecución por rol de servicios publicados; los permisos individuales por servicio o campo siguen pendientes.
 
 El backend autoriza el acceso en cada solicitud; ocultar controles no es la medida de seguridad. No se debe habilitar la API legacy en un entorno compartido. Para una siguiente apertura pública hacen falta verificación de identidad/correo, recuperación de cuenta, operación administrada y una revisión de seguridad de despliegue.
+
+## Actualizacion de arquitectura
+
+Backend y SQLite fueron trasladados al repositorio ../backend con NestJS. Design y Runtime son clientes HTTP. El catalogo de rutas, RestTable y el contrato TSX v1 habilitan un experimento tecnico reproducible. Las decisiones historicas que excluian toda sincronizacion quedan sustituidas por este alcance acotado.

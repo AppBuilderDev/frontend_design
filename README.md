@@ -1,20 +1,24 @@
 # AppBuilderDev Design
 
-Frontend React, TypeScript, Vite y Craft.js. El servidor y las pruebas de dominio se trasladaron al repositorio ../backend. Este repositorio no contiene persistencia ni credenciales del backend.
+Frontend React + TypeScript + Vite + Craft.js. No contiene servidor, persistencia ni credenciales. Consume el backend NestJS del repositorio ../backend mediante HTTP. Node 24 recomendado.
 
-Usar Node 24. Iniciar primero npm run dev en ../backend y npm run dev en ../frontend_runtime. Aqui instalar con npm ci y ejecutar npm run dev. Design: http://localhost:5173/workspace, Runtime: http://localhost:5174, API: http://localhost:3001.
+## Ejecutar (tres terminales)
 
-Copiar .env.example a .env si no existe. PLATFORM_API_TARGET configura el proxy /api/v1; VITE_RUNTIME_URL configura el enlace a Runtime. Mantener el mismo host en ambos frontends para compartir la sesion.
+1. En ../backend: `npm ci --ignore-scripts`, preparar .env y `npm run dev` (3001).
+2. Aqui: `npm ci --ignore-scripts`, copiar .env.example a .env si no existe y `npm run dev` (5173).
+3. En ../frontend_runtime: `npm ci`, `npm run dev` (5174).
 
-Se preservan el editor visual, paginas, entidades, inventario, servicios, conexiones y equipo. Guardar conserva el borrador; Publicar requiere rol propietario y actualiza Runtime.
+Abrir http://localhost:5173/workspace. Usa siempre localhost en ambos frontends o siempre 127.0.0.1 para compartir la sesion. PLATFORM_API_TARGET configura el destino del proxy /api/v1; VITE_RUNTIME_URL abre Runtime. No hay variables de base de datos ni secretos en este frontend.
 
-Verificar con npm run build, npm run lint y npm test. npm run test:e2e inicia el backend separado y ambos frontends con SQLite temporal. Las pruebas del servidor viven en ../backend/tests.
+## Flujo backend -> rutas -> pagina
 
-## Rutas y tablas HTTP
+1. Crear una cuenta/proyecto o iniciar sesion con una existente.
+2. En Rutas y endpoints, **Crear recurso en backend** con nombre, identificador y campos. Tambien puedes crear el endpoint en un controlador Nest propio del backend.
+3. **Registrar ruta** para cada metodo HTTP: GET /api/v1/projects/{projectId}/resources/productos, POST misma ruta, PUT o PATCH con /:id y DELETE con /:id. Define fields (key, label, type, required) y itemsPath=items para la lista. Admite buscar, editar y eliminar rutas con confirmacion. Rutas usadas en paginas no se eliminan sin desvincular.
+4. Crear una pagina y agregar **Tabla HTTP**. En Servicios HTTP del inspector, seleccionar las rutas GET, POST, PUT/PATCH y DELETE.
+5. Guardar borrador y Publicar como propietario. Runtime abre /p/{proyecto}/{codigo}. Desde la tabla puedes crear, editar y eliminar registros con el backend real.
 
-En Rutas y endpoints puedes crear recursos CRUD en el backend y registrar sus rutas HTTP. Registrar una ruta no crea el endpoint: conserva su contrato para conectarlo a la pagina. Se permite listar, buscar, crear, editar y eliminar rutas no vinculadas.
-
-Agrega Tabla HTTP a una pagina y selecciona las rutas GET, POST, PUT/PATCH y DELETE en Servicios HTTP. Los campos y la ruta de items se definen en el catalogo. Publicar conserva los contratos y permite operar desde Runtime; el borrador no ejecuta escrituras. Los metodos reales son autorizados y validados por el backend independiente.
+Se conservan el constructor de entidades, inventario, servicios configurables, conexiones externas, permisos, sesiones y bloques existentes. No se cambiaron remotos ni se hizo push.
 
 ## Codigo y sincronizacion
 
@@ -23,3 +27,22 @@ El boton **Codigo** muestra TSX generado desde el arbol del editor. Los cambios 
 Contrato TSX v1: imports de ./builder-components, export default function Page con un unico return JSX; componentes del registro con builderId estable y config JSON. No soporta React arbitrario, hooks, variables, spreads, funciones, expresiones ejecutables ni imports externos. No se usa eval. El archivo descargado Page.tsx puede colocarse en src/ de Design o Runtime, que incluyen src/builder-components.tsx y el renderizador. Los componentes de datos requieren DataProvider del proyecto, igual que el Runtime dinamico. No es una exportacion standalone de todo el proyecto.
 
 Cada panel permite exportar mediciones JSON de conversion (direccion, exito, duracion, nodos y errores). Descargar conserva el texto pendiente. El archivo generado no contiene credenciales.
+
+## Verificar y reproducir el experimento
+
+```powershell
+npm run build
+npm run lint
+npm test
+npm run test:experiment
+npm run test:e2e
+npm run format:check
+```
+
+El experimento escribe artifacts/sync-experiment.json con 150 observaciones: 50 conversiones visual a codigo, 50 codigo a visual y 50 rechazos controlados. Prueba la conservacion de conexiones. El E2E builder-flow.spec.ts verifica Nest, catalogo CRUD, sincronizacion en ambas direcciones y CRUD real de tabla en Runtime. La bateria de navegador usa bases temporales; no escribe en tu base local. Las pruebas de servidor viven exclusivamente en ../backend/tests.
+
+Esto habilita el experimento tecnico sobre el subconjunto declarado; no demuestra facilidad de uso, ahorro de tiempo humano ni superioridad frente a IA. Ver docs/experiment.md y docs/contract.md.
+
+## Probar el backend en Swagger
+
+Disponible en http://localhost:3001/docs/. Crear un recurso desde Rutas y endpoints habilita su CRUD sin escribir un controlador. Registrar una ruta solo guarda su contrato. Para logica propia usar los servicios configurables o programar un controlador Nest. Swagger muestra los recursos en rutas parametrizadas: por ejemplo key=productos.

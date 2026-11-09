@@ -65,4 +65,4 @@ Las copias y el procedimiento general de recuperación de E1 también incluyen l
 
 ## Requisitos cubiertos y límites
 
-E2 implementa RF-I03 a RF-I10 y los permisos operativos del inventario de RF-B17. RF-B28 queda cubierto para estas tres operaciones predeterminadas; E3-A añade composición de pasos permitidos para servicios propios. Continúan fuera de alcance almacenes múltiples, reservas, lotes, valorización/costo promedio, permisos genéricos por campo y flujos avanzados. Se mantienen fuera IA, Figma y sincronización bidireccional.
+E2 implementa RF-I03 a RF-I10 y los permisos operativos del inventario de RF-B17. RF-B28 queda cubierto para estas tres operaciones predeterminadas; E3-A añade composición de pasos permitidos para servicios propios. Continúan fuera de alcance almacenes múltiples, reservas, lotes, valorización/costo promedio, permisos genéricos por campo y flujos avanzados. IA y Figma siguen fuera; la etapa actual incorpora sincronizacion para el subconjunto TSX v1.

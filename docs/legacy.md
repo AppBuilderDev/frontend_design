@@ -1,3 +1,5 @@
+> Referencia historica. La API se traslado al repositorio ../backend. Los comandos npm run api y npm --prefix ../backend run dev ya no existen en Design. Para los escenarios legacy, habilitar ENABLE_LEGACY_API en backend y usar npm run test:e2e:legacy desde Design.
+
 # Modo anterior: referencia histórica
 
 Solo para desarrollo local con ENABLE_LEGACY_API=1 y VITE_LEGACY_UI=1. No tiene aislamiento ni autenticación. La documentación vigente está en el README principal.
@@ -11,7 +13,7 @@ Aplicación React + TypeScript estricto + Vite + React Router + Tailwind CSS 4 +
 ```powershell
 npm ci
 Copy-Item .env.example .env
-npm run dev:all
+npm --prefix ../backend run dev
 ```
 
 Design: http://localhost:5173. API: http://localhost:3001. Instalar y levantar Runtime desde su propio repositorio en otro terminal (`npm ci`, `npm run dev`). También pueden ejecutarse `npm run api` y `npm run dev` en terminales separados. Los puertos del frontend son estrictos, no se escoge otro si están ocupados.
@@ -23,7 +25,7 @@ Design: http://localhost:5173. API: http://localhost:3001. Instalar y levantar R
 - API_PORT / API_HOST: 3001 / 127.0.0.1. La API escucha solo en loopback por defecto.
 - CORS_ORIGINS: lista de orígenes separados por comas; permite localhost y 127.0.0.1 en 5173/5174 por defecto. Reiniciar la API tras cambios.
 - BLOCKS_FILE: archivo opcional de bloques reutilizables; por defecto `blocks.json` junto a PAGES_FILE.
-- PAGES_FILE: archivo de datos opcional; las rutas relativas se resuelven desde el directorio de ejecución. Por defecto server/data/pages.json. Se crea al guardar la primera página. El archivo está excluido de Git; mantener copia de seguridad si se desea conservar trabajo.
+- PAGES_FILE: archivo de datos opcional; las rutas relativas se resuelven desde el directorio de ejecución. Por defecto ../backend/data/pages.json. Se crea al guardar la primera página. El archivo está excluido de Git; mantener copia de seguridad si se desea conservar trabajo.
 
 Vite carga .env al arrancar; sus variables VITE_* son públicas y quedan integradas en el build. La API carga .env mediante el script npm.
 

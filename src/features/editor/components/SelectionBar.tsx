@@ -1,3 +1,4 @@
+import { componentLabels } from '../config/labels';
 import { Copy, ClipboardPaste, CopyPlus, BookmarkPlus, Trash2, ChevronRight } from 'lucide-react';
 export function SelectionBar({
   path,
@@ -28,7 +29,7 @@ export function SelectionBar({
               aria-current={index === path.length - 1 ? 'location' : undefined}
               onClick={() => onSelect(item.id)}
             >
-              {item.label}
+              {componentLabels[item.label] ?? item.label}
             </button>
           </span>
         ))}

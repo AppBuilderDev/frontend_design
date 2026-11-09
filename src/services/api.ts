@@ -33,10 +33,15 @@ export const pagesApi = {
     });
   },
 };
-export const runtimeUrl = (import.meta.env.VITE_RUNTIME_URL ?? 'http://localhost:5174').replace(
-  /\/$/,
-  '',
-);
+// Keep loopback hosts consistent so Design and Runtime share the session cookie.
+const runtimeAddress = new URL(import.meta.env.VITE_RUNTIME_URL ?? 'http://localhost:5174');
+if (
+  typeof window !== 'undefined' &&
+  ['localhost', '127.0.0.1', '[::1]'].includes(runtimeAddress.hostname) &&
+  ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
+)
+  runtimeAddress.hostname = window.location.hostname;
+export const runtimeUrl = runtimeAddress.toString().replace(/\/$/, '');
 
 export const blocksApi = {
   list: async (): Promise<SavedBlock[]> => blockSchema.array().parse(await request('/api/blocks')),

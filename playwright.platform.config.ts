@@ -34,7 +34,7 @@ export default defineConfig({
       cwd: '../frontend_runtime',
       url: 'http://127.0.0.1:5184',
       reuseExistingServer: false,
-      env: { PLATFORM_API_TARGET: 'http://127.0.0.1:3101' },
+      env: { PLATFORM_API_TARGET: 'http://127.0.0.1:3101', VITE_API_URL: 'http://127.0.0.1:3101' },
     },
   ],
 });

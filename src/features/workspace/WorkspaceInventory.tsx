@@ -33,8 +33,11 @@ export function WorkspaceInventory() {
     <main className="workspace-content">
       <div className="workspace-heading">
         <div>
-          <h1>Inventario operativo</h1>
-          <p>Registra entradas, salidas y ajustes con un historial que conserva cada cambio.</p>
+          <span className="eyebrow">EL DÍA A DÍA DE TU NEGOCIO</span>
+          <h1>Mi inventario</h1>
+          <p>
+            Consulta tus existencias y registra lo que entra o sale. Cada movimiento queda guardado.
+          </p>
         </div>
       </div>
       {error && (

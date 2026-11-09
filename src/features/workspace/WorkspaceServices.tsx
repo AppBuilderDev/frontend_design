@@ -15,14 +15,15 @@ export function WorkspaceServices() {
     <main className="workspace-content">
       <div className="workspace-heading">
         <div>
-          <h1>Servicios propios</h1>
+          <span className="eyebrow">DALE FUNCIONES A TU APLICACIÓN</span>
+          <h1>Acciones y conexiones</h1>
           <p>
-            Cada entidad tiene operaciones validadas. Las páginas se conectan por identificador, sin
-            guardar credenciales.
+            Conecta otros sistemas o define qué debe suceder al enviar un formulario. Puedes empezar
+            con tus páginas y volver aquí después.
           </p>
         </div>
         <Link className="workspace-text-link" to="/workspace/data">
-          Administrar entidades
+          Ver mis listas de datos
         </Link>
       </div>
       <ConnectionsWorkspace />
@@ -34,7 +35,9 @@ export function WorkspaceServices() {
         </p>
       )}
       {!entities.length && (
-        <p className="workspace-empty">Crea una entidad en Datos para disponer de sus servicios.</p>
+        <p className="workspace-empty">
+          Crea una lista en Mis datos para consultar y administrar sus registros.
+        </p>
       )}
       {entities.map((entity) => (
         <section className="service-card" key={entity.id}>
@@ -57,7 +60,7 @@ export function WorkspaceServices() {
             ))}
           </div>
           <details>
-            <summary>Contrato y validaciones</summary>
+            <summary>Detalles técnicos y validaciones</summary>
             <pre>{'/api/v1/projects/' + project.id + '/services/' + entity.id + '/records'}</pre>
             <p>
               Entrada: valores declarados por la entidad. Los campos desconocidos se rechazan. Los

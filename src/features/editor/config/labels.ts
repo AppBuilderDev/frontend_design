@@ -1,0 +1,28 @@
+export const componentLabels: Record<string, string> = {
+  Container: 'Contenedor',
+  Heading: 'Título',
+  Paragraph: 'Texto',
+  Button: 'Botón',
+  Input: 'Campo de texto',
+  Card: 'Tarjeta',
+  DataTable: 'Tabla de datos',
+  DataForm: 'Formulario',
+  DataDetail: 'Detalle de un registro',
+  Inventory: 'Inventario',
+  ServiceForm: 'Formulario de acción',
+  ApiQuery: 'Consulta externa',
+};
+export const componentDescriptions: Record<string, string> = {
+  Container: 'Agrupa y organiza otros elementos',
+  Heading: 'Destaca una idea con un título',
+  Paragraph: 'Añade una descripción o un mensaje',
+  Button: 'Lleva a tus usuarios a otra página',
+  Input: 'Muestra un campo de texto',
+  Card: 'Presenta contenido dentro de una tarjeta',
+  DataTable: 'Muestra y busca registros de una lista',
+  DataForm: 'Permite crear o editar registros',
+  DataDetail: 'Muestra la información de un registro',
+  Inventory: 'Entradas, salidas y existencias',
+  ServiceForm: 'Ejecuta una acción que hayas configurado',
+  ApiQuery: 'Consulta datos de otro sistema',
+};

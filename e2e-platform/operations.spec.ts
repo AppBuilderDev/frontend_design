@@ -120,12 +120,12 @@ test('inventario operativo, recuperación de conexión y usuarios sin acceso de 
     page.getByRole('table', { name: 'Historial de inventario' }).locator('tbody tr'),
   ).toHaveCount(4);
   await page.screenshot({ path: 'test-results/inventory-operations.png', fullPage: true });
-  await page.getByRole('link', { name: 'Páginas', exact: true }).click();
+  await page.getByRole('link', { name: 'Mis páginas', exact: true }).click();
   await page.getByRole('button', { name: 'Crear página', exact: true }).click();
   await page.getByLabel('Nombre', { exact: true }).fill('Inventario operativo');
-  await page.getByLabel('Código', { exact: true }).fill('inventario');
+  await page.getByLabel('Dirección de la página', { exact: true }).fill('inventario');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear página', exact: true }).click();
-  await page.getByRole('button', { name: 'Inventory', exact: true }).click();
+  await page.getByRole('button', { name: 'Inventario', exact: true }).click();
   await page.getByRole('button', { name: 'Publicar', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('publicados');
   await page.getByRole('link', { name: 'Volver a páginas', exact: true }).click();

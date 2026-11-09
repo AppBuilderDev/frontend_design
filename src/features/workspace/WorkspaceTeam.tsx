@@ -40,9 +40,11 @@ export function WorkspaceTeam() {
     <main className="workspace-content">
       <div className="workspace-heading">
         <div>
+          <span className="eyebrow">MEJOR EN EQUIPO</span>
           <h1>Equipo y proyecto</h1>
           <p>
-            {project.organization} tiene un único proyecto. Compartirlo no crea copias de sus datos.
+            Invita a tu equipo a {project.organization} y elige qué puede hacer cada persona. Todos
+            trabajan sobre la misma información.
           </p>
         </div>
       </div>

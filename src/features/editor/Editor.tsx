@@ -1,3 +1,4 @@
+import { EditorLibrary } from './components/EditorLibrary';
 import { useConnections } from '../workspace/useConnections';
 import { useOperations } from '../workspace/useOperations';
 import { DataProvider } from '../../components/dataComponents';
@@ -6,14 +7,13 @@ import { useEntities } from '../workspace/useEntities';
 import { Editor as CraftEditor } from '@craftjs/core';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, GripVertical, Component, Blocks } from 'lucide-react';
+import { Plus, Layers, Blocks, X } from 'lucide-react';
 import { useEditor } from './hooks/useEditor';
 import { ComponentTree } from './components/ComponentTree';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { EditorCanvas } from './components/EditorCanvas';
 import { EditorToolbar } from './components/EditorToolbar';
 import { runtimeUrl } from '../../services/api';
-import { catalog } from '../../components/renderer';
 import { CraftRoot, CraftBlock } from './craft/CraftComponents';
 import { ROOT, fromCraft } from './craft/adapter';
 import { useEditorCommands } from './hooks/useEditorCommands';
@@ -21,7 +21,6 @@ import { useBlocks } from './hooks/useBlocks';
 import { BlockLibrary, SaveBlockDialog } from './components/BlockLibrary';
 import { SelectionBar } from './components/SelectionBar';
 import type { ComponentNode } from '../../models/contracts';
-import { defaults } from './config/catalog';
 import type { Page } from '../../models/contracts';
 
 type Session = ReturnType<typeof useEditor>;
@@ -86,7 +85,6 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
   });
   const {
     actions,
-    connectors,
     serialized,
     selected,
     canUndo,
@@ -95,16 +93,21 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
     ids,
     node,
     containers,
-    element,
     add,
     reorder,
   } = commands;
   const library = useBlocks();
-  const [tab, setTab] = useState<'components' | 'blocks'>('components');
+  const [tab, setTab] = useState<'components' | 'blocks' | 'layers' | null>('components');
+  const [dismissedInspector, setDismissedInspector] = useState('');
+
+  const changeProperty = (key: string, value: string) =>
+    actions.history.throttle(400).setProp(selected, (props) => {
+      props.nodeProps[key] = value;
+    });
   const [blockSelection, setBlockSelection] = useState<ComponentNode[]>();
   const { dirty, preview, busy, error, notice } = session;
   return (
-    <div className="editor-shell">
+    <div className={'editor-shell studio-editor classic-editor' + (preview ? ' is-preview' : '')}>
       <EditorToolbar
         page={page}
         dirty={dirty}
@@ -125,70 +128,57 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
       )}
       <div className="editor-body">
         {!preview && (
-          <aside className="editor-left">
-            <div className="library-tabs" role="tablist" aria-label="Biblioteca de inserción">
+          <aside className="editor-left studio-library" aria-label="Biblioteca del editor">
+            <nav className="classic-tabs" aria-label="Herramientas del editor">
               <button
-                role="tab"
-                id="components-tab"
-                aria-selected={tab === 'components'}
-                aria-controls="components-panel"
+                aria-label="Añadir elementos"
+                aria-pressed={tab === 'components'}
                 onClick={() => setTab('components')}
               >
-                <Component size={15} />
-                Componentes
+                <Plus size={15} />
+                Elementos
               </button>
               <button
-                role="tab"
-                id="blocks-tab"
-                aria-selected={tab === 'blocks'}
-                aria-controls="blocks-panel"
+                aria-label="Ver capas"
+                aria-pressed={tab === 'layers'}
+                onClick={() => setTab('layers')}
+              >
+                <Layers size={15} />
+                Estructura
+              </button>
+              <button
+                title="Secciones"
+                aria-label="Ver secciones"
+                aria-pressed={tab === 'blocks'}
                 onClick={() => setTab('blocks')}
               >
                 <Blocks size={15} />
-                Bloques
+                Secciones
               </button>
-            </div>
-            <div
-              role="tabpanel"
-              id="components-panel"
-              aria-labelledby="components-tab"
-              hidden={tab !== 'components'}
-            >
-              <div className="catalog">
-                {catalog.map((type) => (
+            </nav>
+            {tab && (
+              <div className="classic-library-content">
+                <div className="classic-library-heading">
+                  <h2 className="sr-only">
+                    {tab === 'components'
+                      ? 'Añadir elementos'
+                      : tab === 'layers'
+                        ? 'Estructura de la página'
+                        : 'Secciones'}
+                  </h2>
                   <button
-                    key={type}
-                    ref={(el) => {
-                      if (el)
-                        connectors.create(
-                          el,
-                          element({ id: crypto.randomUUID(), type, props: { ...defaults[type] } }),
-                        );
-                    }}
-                    title={'Arrastra ' + type + ' al lienzo o haz clic para añadirlo'}
-                    onClick={() => add(type)}
+                    className="mobile-panel-close"
+                    aria-label="Cerrar biblioteca"
+                    onClick={() => setTab(null)}
                   >
-                    <Plus size={16} />
-                    {type}
-                    <GripVertical className="catalog-grip" size={12} />
+                    <X size={15} />
                   </button>
-                ))}
+                </div>
+                {tab === 'components' && <EditorLibrary onAdd={add} />}
+                {tab === 'blocks' && <BlockLibrary library={library} onInsert={commands.insert} />}
+                {tab === 'layers' && <ComponentTree nodes={nodes} selected={selected} ids={ids} />}
               </div>
-              <p className="panel-help">
-                Arrastra al lienzo para elegir la posición. Haz clic para añadir dentro del
-                contenedor seleccionado.
-              </p>
-            </div>
-            <div
-              role="tabpanel"
-              id="blocks-panel"
-              aria-labelledby="blocks-tab"
-              hidden={tab !== 'blocks'}
-            >
-              <BlockLibrary library={library} onInsert={commands.insert} />
-            </div>
-            <div className="panel-heading border-t">Capas de la página</div>
-            <ComponentTree nodes={nodes} selected={selected} ids={ids} />
+            )}
           </aside>
         )}
         <EditorCanvas
@@ -218,14 +208,12 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
         />
         {!preview && (
           <PropertiesPanel
+            mobileDismissed={!!node && dismissedInspector === selected}
             key={selected}
             node={node}
             containers={containers}
-            onProperty={(key, value) =>
-              actions.history.throttle(400).setProp(selected, (props) => {
-                props.nodeProps[key] = value;
-              })
-            }
+            onClose={() => setDismissedInspector(selected)}
+            onProperty={changeProperty}
             onReorder={reorder}
             onMove={(id) => {
               const parent = id ? ids.get(id)! : ROOT;
@@ -245,7 +233,7 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
           target="_blank"
           rel="noreferrer"
         >
-          Abrir Runtime ↗
+          Ver aplicación ↗
         </a>
       </footer>
       {commands.message && (

@@ -68,3 +68,27 @@ it('aplica distribución y espaciado por lado y filtra valores CSS inseguros', (
   expect(html).toContain('grid-template-columns:repeat(3, minmax(0, 1fr))');
   expect(html).not.toContain('expression');
 });
+
+it('conserva el formato de texto publicado y rechaza valores de estilo inseguros', () => {
+  const html = renderToStaticMarkup(
+    <RenderTree
+      nodes={[
+        {
+          id: 'formatted',
+          type: 'Paragraph',
+          props: {
+            text: 'Texto con formato',
+            fontWeight: '700',
+            fontStyle: 'italic',
+            textDecoration: 'underline',
+            color: 'url(https://invalid.test)',
+          },
+        },
+      ]}
+    />,
+  );
+  expect(html).toContain('font-weight:700');
+  expect(html).toContain('font-style:italic');
+  expect(html).toContain('text-decoration:underline');
+  expect(html).not.toContain('invalid.test');
+});

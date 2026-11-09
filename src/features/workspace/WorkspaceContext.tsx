@@ -119,16 +119,16 @@ function AuthScreen({
   return (
     <main className="workspace-auth">
       <section className="auth-story">
-        <span className="auth-brand">AppBuilderDev</span>
-        <h1>De tus datos a una aplicación que funciona.</h1>
+        <span className="auth-brand">AppBuilder.</span>
+        <h1>Tu próxima gran idea empieza aquí.</h1>
         <p>
-          Define entidades, conecta servicios y construye con tu equipo. Tu organización comienza
-          con un proyecto privado.
+          Crea herramientas para tu negocio sin saber programar. Organiza tu información, diseña tus
+          páginas y trabaja con tu equipo.
         </p>
         <div className="auth-sample">
           <strong>Tu primera aplicación</strong>
-          <span>Productos → Formulario → Servicio → Listado</span>
-          <small>Organiza tus catálogos y conecta cada pantalla con sus datos.</small>
+          <span>01 Organiza tus datos · 02 Diseña · 03 Comparte</span>
+          <small>Todo lo que necesitas, en un solo espacio. A tu ritmo.</small>
         </div>
       </section>
       <section className="auth-form">
@@ -177,7 +177,7 @@ function AuthScreen({
           )}
           {register && !invitation && (
             <label>
-              Organización
+              Nombre de tu negocio o equipo
               <input
                 name="organization"
                 required
@@ -217,9 +217,7 @@ function AuthScreen({
               </button>
             </div>
           </div>
-          {register && (
-            <small>Al menos 12 caracteres. Nunca guardamos tu contraseña en texto plano.</small>
-          )}
+          {register && <small>Usa al menos 12 caracteres para proteger tu cuenta.</small>}
           {error && (
             <p role="alert" className="alert">
               {error}

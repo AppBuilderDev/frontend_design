@@ -1,6 +1,6 @@
 import { getProjectScope } from '../../../services/projectScope';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Save, Eye, Undo2, Redo2 } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Undo2, Redo2, Check, Send } from 'lucide-react';
 import type { Page } from '../../../models/contracts';
 interface Props {
   page: Page;
@@ -41,15 +41,25 @@ export function EditorToolbar({
               e.preventDefault();
           }}
         >
-          <ArrowLeft size={19} />
+          <ArrowLeft size={18} />
+          <span>Páginas</span>
         </Link>
         <span className="toolbar-divider" />
         <div>
-          <strong>{page.name}</strong>
+          <strong>
+            {scope && (
+              <>
+                <span className="editor-organization">{scope.organization}</span>
+                <span className="editor-breadcrumb-slash"> / </span>
+              </>
+            )}
+            {page.name}
+          </strong>
           <small className="block">/{page.code}</small>
         </div>
-        <span className={'badge ' + page.status}>
-          {dirty ? 'Sin guardar' : page.status === 'published' ? 'Publicado' : 'Borrador'}
+        <span className="editor-save-state">
+          <Check size={15} />
+          {dirty ? 'Sin guardar' : 'Cambios guardados'}
         </span>
       </div>
       <div className="actions">
@@ -78,20 +88,26 @@ export function EditorToolbar({
           {preview ? 'Editar' : 'Vista previa'}
         </button>
         <button
-          className="primary"
+          className="save-draft"
           disabled={busy || readOnly}
           title={
             scope
-              ? 'Conserva el borrador sin cambiar Runtime'
+              ? 'Guarda tu trabajo. La aplicación publicada todavía no cambia.'
               : 'Guarda los cambios y los hace públicos en Runtime'
           }
           onClick={() => void save()}
         >
           <Save size={15} />
-          {busy ? 'Guardando…' : 'Guardar'}
+          {busy ? 'Guardando…' : scope ? 'Guardar borrador' : 'Guardar'}
         </button>
         {scope?.role === 'owner' && (
-          <button className="primary" disabled={busy} onClick={onPublish}>
+          <button
+            className="primary"
+            title="Hace visible esta versión en tu aplicación para quienes tienen acceso"
+            disabled={busy}
+            onClick={onPublish}
+          >
+            <Send size={15} />
             Publicar
           </button>
         )}

@@ -82,12 +82,12 @@ test('configura ambientes, cifra credenciales, publica una conexión y la consul
     .getByRole('button', { name: 'Publicar conexión Catálogo externo', exact: true })
     .click();
   await expect(page.getByText('Versión predeterminada 1', { exact: true })).toBeVisible();
-  await page.getByRole('link', { name: 'Páginas', exact: true }).click();
+  await page.getByRole('link', { name: 'Mis páginas', exact: true }).click();
   await page.getByRole('button', { name: 'Crear página', exact: true }).click();
   await page.getByLabel('Nombre', { exact: true }).fill('Catálogo del proveedor');
-  await page.getByLabel('Código', { exact: true }).fill('proveedor');
+  await page.getByLabel('Dirección de la página', { exact: true }).fill('proveedor');
   await page.getByRole('dialog').getByRole('button', { name: 'Crear página', exact: true }).click();
-  await page.getByRole('button', { name: 'ApiQuery', exact: true }).click();
+  await page.getByRole('button', { name: 'Consulta externa', exact: true }).click();
   await page
     .getByRole('combobox', { name: 'Conexión externa seleccionada', exact: true })
     .selectOption(connection.id);
@@ -147,7 +147,7 @@ test('configura ambientes, cifra credenciales, publica una conexión y la consul
       runtime.getByText('La consulta no devolvió resultados.', { exact: true }),
     ).toBeVisible();
     await page.getByRole('link', { name: 'Volver a páginas', exact: true }).click();
-    await page.getByRole('link', { name: 'Servicios', exact: true }).click();
+    await page.getByRole('link', { name: 'Acciones y conexiones', exact: true }).click();
     await page.getByRole('button', { name: 'Configurar producción', exact: true }).click();
     const rotate = page.getByRole('dialog');
     await rotate.getByLabel('Ruta fija', { exact: true }).fill('/production/rotated');

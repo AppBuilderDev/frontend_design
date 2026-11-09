@@ -35,8 +35,11 @@ export function OperationsWorkspace({ entities }: { entities: Entity[] }) {
     <section className="operations-workspace">
       <div className="workspace-heading">
         <div>
-          <h2>Servicios configurables</h2>
-          <p>Conecta varios pasos y confirma sus escrituras juntas.</p>
+          <h2>Acciones de tu aplicación</h2>
+          <p>
+            Por ejemplo: reservar un producto o registrar una venta. Define los pasos y prueba antes
+            de publicar.
+          </p>
         </div>
       </div>
       {error && (
@@ -47,7 +50,7 @@ export function OperationsWorkspace({ entities }: { entities: Entity[] }) {
       {project.role !== 'reader' && (
         <div className="operation-template">
           <label>
-            Entidad inicial
+            Lista de datos inicial
             <select
               aria-label="Entidad inicial del servicio"
               value={entity?.id ?? ''}

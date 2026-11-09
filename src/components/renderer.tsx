@@ -62,12 +62,14 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
     const href =
       context && /^\/(?!\/)/.test(original) ? '/p/' + context.projectId + original : original;
     const safe = /^(https?:\/\/|\/(?!\/)|#)/.test(href);
+    const { color, backgroundColor } = style(node.props);
+    const colors = { color, backgroundColor };
     return safe ? (
-      <a className="builder-button" href={href}>
+      <a className="builder-button" href={href} style={colors}>
         {str(node.props.text, 'Continuar')}
       </a>
     ) : (
-      <button type="button" className="builder-button">
+      <button type="button" className="builder-button" style={colors}>
         {str(node.props.text, 'Continuar')}
       </button>
     );
@@ -187,9 +189,14 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
 }
 export function ComponentView({ node, children }: ViewProps) {
   const View = Object.hasOwn(registry, node.type) ? registry[node.type] : undefined;
+  const wrapperStyle = style(node.props, node.type !== 'Container' && node.type !== 'Card');
+  if (node.type === 'Button') {
+    delete wrapperStyle.color;
+    delete wrapperStyle.backgroundColor;
+  }
   return (
     <Boundary>
-      <div style={style(node.props, node.type !== 'Container' && node.type !== 'Card')}>
+      <div style={wrapperStyle}>
         {View ? (
           <View node={node}>{children}</View>
         ) : (

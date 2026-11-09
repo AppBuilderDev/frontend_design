@@ -1900,6 +1900,34 @@ code {
   padding-left: 0;
   margin-top: 16px;
 }
+.auth-password-field {
+  display: grid;
+  gap: 8px;
+}
+.auth-password-input {
+  position: relative;
+}
+.auth-password-input input {
+  width: 100%;
+  padding-right: 48px;
+}
+.auth-form .auth-password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: #60708a;
+}
+.auth-form .auth-password-toggle:hover {
+  color: #6253dc;
+  background: #efedff;
+}
 .auth-screen {
   min-height: 100vh;
   background: #f5f7fb;

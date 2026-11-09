@@ -22,6 +22,7 @@ import {
 } from '../models/data';
 import { ApiError, platformRequest } from '../services/platformHttp';
 interface DataState {
+  applicationPath?: string;
   endpoints: Endpoint[];
   connections: ConnectionContract[];
   operations: OperationContract[];
@@ -37,6 +38,7 @@ interface DataState {
 const DataContext = createContext<DataState | undefined>(undefined);
 export const useDataContext = () => useContext(DataContext);
 export function DataProvider({
+  applicationPath,
   projectId,
   entities,
   canWrite,
@@ -46,6 +48,7 @@ export function DataProvider({
   preview = false,
   children,
 }: {
+  applicationPath?: string;
   projectId: string;
   entities: Entity[];
   canWrite: boolean;
@@ -65,6 +68,7 @@ export function DataProvider({
   return (
     <DataContext.Provider
       value={{
+        applicationPath,
         endpoints,
         projectId,
         entities,

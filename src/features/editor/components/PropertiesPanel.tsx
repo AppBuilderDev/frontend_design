@@ -1,3 +1,4 @@
+import { CatalogProperties } from './CatalogProperties';
 import { componentLabels } from '../config/labels';
 import { useDataContext } from '../../../components/dataComponents';
 import { StyleControls } from './StyleControls';
@@ -269,7 +270,9 @@ export function PropertiesPanel({
           )}
           {node.type === 'RestTable' && (
             <>
-              <div className="panel-heading">Servicios HTTP</div>
+              <div className="panel-heading" data-kind="data">
+                Servicios HTTP
+              </div>
               {[
                 ['listEndpointId', 'Ruta GET', ['GET']],
                 ['createEndpointId', 'Ruta POST', ['POST']],
@@ -308,7 +311,9 @@ export function PropertiesPanel({
           )}
           {['DataForm', 'DataTable', 'DataDetail'].includes(node.type) && (
             <>
-              <div className="panel-heading">Conexión de datos</div>
+              <div className="panel-heading" data-kind="data">
+                Conexión de datos
+              </div>
               <label>
                 Entidad
                 <select
@@ -352,7 +357,9 @@ export function PropertiesPanel({
           )}
           {node.type === 'ServiceForm' && (
             <>
-              <div className="panel-heading">Conexión de servicio</div>
+              <div className="panel-heading" data-kind="data">
+                Conexión de servicio
+              </div>
               <label>
                 Servicio publicado
                 <select
@@ -390,7 +397,9 @@ export function PropertiesPanel({
           )}
           {node.type === 'ApiQuery' && (
             <>
-              <div className="panel-heading">Conexión externa</div>
+              <div className="panel-heading" data-kind="data">
+                Conexión externa
+              </div>
               <label>
                 Conexión publicada
                 <select
@@ -426,6 +435,7 @@ export function PropertiesPanel({
               </small>
             </>
           )}
+          <CatalogProperties node={node} onChange={prop} />
           <StyleControls node={node} onChange={prop} />
           <div className="panel-heading">Organizar</div>
           <div className="actions">

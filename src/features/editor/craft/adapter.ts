@@ -1,8 +1,10 @@
+import { extraDefinitions } from '../../../components/catalog/definitions';
 import type { SerializedNodes } from '@craftjs/core';
 import type { ComponentNode } from '../../../models/contracts';
 
 export const ROOT = 'ROOT';
-export const isContainer = (type: string) => type === 'Container' || type === 'Card';
+export const isContainer = (type: string) =>
+  type === 'Container' || type === 'Card' || !!extraDefinitions[type]?.container;
 export const craftId = (id: string) => `page:${id}`;
 
 /** Keep Craft's editor state out of the public page contract. */

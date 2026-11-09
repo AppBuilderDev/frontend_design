@@ -41,8 +41,18 @@ export function PageTable({
         </div>
       </div>
       {loading ? (
-        <div className="empty" role="status">
-          Cargando páginas...
+        <div className="page-loading" role="status">
+          <span className="sr-only">Cargando páginas...</span>
+          <div className="table-skeleton" aria-hidden="true">
+            {[0, 1, 2].map((row) => (
+              <div className="skeleton-row" key={row}>
+                <i />
+                <span />
+                <span />
+                <span />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <>
@@ -63,7 +73,7 @@ export function PageTable({
                     (p.name + ' ' + p.code).toLowerCase().includes(query.toLowerCase()),
                   )
                   .map((page) => (
-                    <tr key={page.id}>
+                    <tr key={page.id} data-status={page.status}>
                       <td>
                         <Link
                           className="page-name"
@@ -80,7 +90,9 @@ export function PageTable({
                           className="published-route"
                           href={
                             runtimeUrl +
-                            (getProjectScope() ? '/p/' + getProjectScope()!.id : '') +
+                            (getProjectScope()
+                              ? '/' + (getProjectScope()!.slug ?? 'p/' + getProjectScope()!.id)
+                              : '') +
                             '/' +
                             page.code
                           }

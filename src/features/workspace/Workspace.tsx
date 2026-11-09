@@ -1,3 +1,4 @@
+import { WorkspaceTopbar } from './WorkspaceTopbar';
 import { WorkspaceRoutes } from './WorkspaceRoutes';
 import { WorkspaceInventory } from './WorkspaceInventory';
 import { Link, NavLink, Navigate, Route, Routes } from 'react-router-dom';
@@ -9,7 +10,6 @@ import {
   Layers,
   LogOut,
   Package,
-  ShieldCheck,
   CircleHelp,
 } from 'lucide-react';
 import { WorkspaceGate, useWorkspace } from './WorkspaceContext';
@@ -39,7 +39,9 @@ function WorkspaceShell() {
       </a>
       <aside className="workspace-nav">
         <NavLink to="/workspace" className="workspace-brand">
-          <Layers size={22} />
+          <span className="workspace-brand-mark">
+            <Layers size={22} />
+          </span>
           AppBuilder<span className="brand-dot">.</span>
         </NavLink>
         <span className="workspace-org">{project.organization}</span>
@@ -60,6 +62,7 @@ function WorkspaceShell() {
             ))}
           </select>
         </label>
+        <span className="workspace-nav-label">CONSTRUYE TU APLICACIÓN</span>
         <nav aria-label="Construcción del proyecto">
           {[
             { to: 'pages', label: 'Mis páginas', Icon: FileText },
@@ -82,6 +85,7 @@ function WorkspaceShell() {
           </span>
         </Link>
         <div className="workspace-account">
+          <span className="workspace-account-label">TU CUENTA</span>
           <strong>{session.user.name}</strong>
           <small>
             {project.role === 'owner'
@@ -103,12 +107,7 @@ function WorkspaceShell() {
         </div>
       </aside>
       <div className="workspace-main" id="workspace-content" tabIndex={-1}>
-        <header className="workspace-header">
-          <span>{project.name}</span>
-          <small className="privacy-pill">
-            <ShieldCheck size={14} /> Espacio privado
-          </small>
-        </header>
+        <WorkspaceTopbar />
         {project.archived ? (
           <main className="workspace-content">
             <h1>Proyecto archivado</h1>

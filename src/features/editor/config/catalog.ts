@@ -1,4 +1,8 @@
+import { extraDefinitions } from '../../../components/catalog/definitions';
 export const defaults: Record<string, Record<string, unknown>> = {
+  ...Object.fromEntries(
+    Object.entries(extraDefinitions).map(([type, definition]) => [type, definition.defaults]),
+  ),
   RestTable: {
     title: 'Tabla HTTP',
     listEndpointId: '',

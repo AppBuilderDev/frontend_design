@@ -60,7 +60,7 @@ export function WorkspaceRoutes() {
     }
   }
   return (
-    <main className="workspace-content">
+    <main className="workspace-content routes-workspace">
       <div className="page-heading">
         <div>
           <h1>
@@ -131,7 +131,9 @@ export function WorkspaceRoutes() {
                   <tr key={e.id}>
                     <td>{e.name}</td>
                     <td>
-                      <code>{e.method}</code>
+                      <code className={'http-method method-' + e.method.toLowerCase()}>
+                        {e.method}
+                      </code>
                     </td>
                     <td>
                       <code>{e.path}</code>

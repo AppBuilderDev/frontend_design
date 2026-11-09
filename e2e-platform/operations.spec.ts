@@ -151,7 +151,7 @@ test('inventario operativo, recuperación de conexión y usuarios sin acceso de 
       operator.getByRole('heading', { name: 'Tus aplicaciones', exact: true }),
     ).toBeVisible();
     await operator.getByRole('link', { name: /Abrir Almacén operativo/ }).click();
-    await expect(operator).toHaveURL(new RegExp('5184/p/' + project));
+    await expect(operator).toHaveURL(new RegExp('5184/' + session.projects[0].slug + '/'));
     await operator.getByRole('button', { name: 'Seleccionar Martillo', exact: true }).click();
     const operatorForm = operator.getByRole('form', { name: 'Registrar movimiento', exact: true });
     await expect(

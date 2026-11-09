@@ -1,4 +1,32 @@
 import {
+  LayoutGrid,
+  PanelTop as HeaderIcon,
+  PanelBottom,
+  Navigation,
+  PanelLeft,
+  Image as ImageIcon,
+  Video,
+  UserRound,
+  Quote,
+  Code,
+  CircleAlert,
+  BadgeCheck,
+  ChartColumn,
+  Minus,
+  MoveVertical,
+  ListCollapse,
+  Columns3,
+  FormInput,
+  CheckSquare,
+  ToggleLeft,
+  Calendar,
+  SlidersHorizontal,
+  ChevronDown,
+  Link as LinkIcon,
+  ListOrdered,
+} from 'lucide-react';
+import { extraDefinitions } from '../../../components/catalog/definitions';
+import {
   Type,
   AlignLeft,
   RectangleHorizontal,
@@ -22,6 +50,39 @@ import { isContainer } from '../craft/adapter';
 import { defaults } from '../config/catalog';
 
 const icons: Record<string, typeof Type> = {
+  Section: PanelTop,
+  Header: HeaderIcon,
+  Footer: PanelBottom,
+  Stack: Columns3,
+  Grid: LayoutGrid,
+  Navbar: Navigation,
+  Sidebar: PanelLeft,
+  Breadcrumbs: ListOrdered,
+  Link: LinkIcon,
+  Image: ImageIcon,
+  Video,
+  Avatar: UserRound,
+  List,
+  Quote,
+  CodeBlock: Code,
+  Badge: BadgeCheck,
+  Alert: CircleAlert,
+  Stat: ChartColumn,
+  Progress: SlidersHorizontal,
+  Divider: Minus,
+  Spacer: MoveVertical,
+  Accordion: ListCollapse,
+  Tabs: Columns3,
+  Textarea: FormInput,
+  Select: ChevronDown,
+  RadioGroup: ListOrdered,
+  Checkbox: CheckSquare,
+  Switch: ToggleLeft,
+  DatePicker: Calendar,
+  NumberInput: TextCursorInput,
+  SearchInput: Search,
+  Range: SlidersHorizontal,
+
   Heading: Type,
   Paragraph: AlignLeft,
   Button: RectangleHorizontal,
@@ -61,6 +122,7 @@ function PaletteElement({ type, onAdd }: { type: string; onAdd: (type: string) =
   const Icon = icons[type] ?? SquareDashed;
   return (
     <button
+      data-component-kind={basic.includes(type) || extraDefinitions[type] ? 'basic' : 'data'}
       ref={buttonRef}
       aria-label={componentLabels[type] ?? type}
       title={componentDescriptions[type]}
@@ -106,7 +168,18 @@ export function EditorLibrary({ onAdd }: { onAdd: (type: string) => void }) {
       <div className="element-groups">
         {[
           { title: 'Básicos', types: basic },
-          { title: 'Con tus datos', types: catalog.filter((type) => !basic.includes(type)) },
+          {
+            title: 'Con tus datos',
+            types: catalog.filter((type) => !basic.includes(type) && !extraDefinitions[type]),
+          },
+          ...[
+            ...new Set(Object.values(extraDefinitions).map((definition) => definition.group)),
+          ].map((title) => ({
+            title,
+            types: Object.keys(extraDefinitions).filter(
+              (type) => extraDefinitions[type].group === title,
+            ),
+          })),
         ].map((group) => (
           <section key={group.title} aria-label={group.title}>
             <h3>{group.title}</h3>

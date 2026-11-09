@@ -66,7 +66,7 @@ export function CraftBlock({ nodeId, nodeType, nodeProps, children }: BlockProps
   return (
     <div
       ref={(el) => {
-        if (el) connect(el);
+        if (el) connect(drag(el));
       }}
       className={`canvas-node ${selected ? 'selected' : ''} ${hovered ? 'hovered' : ''} ${dropTarget ? 'drop-target' : ''} ${dropTarget && invalid ? 'drop-invalid' : ''}`}
       data-component-id={nodeId ?? id}

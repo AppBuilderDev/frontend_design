@@ -1,4 +1,8 @@
+import { extraDefinitions } from '../../../components/catalog/definitions';
 export const componentLabels: Record<string, string> = {
+  ...Object.fromEntries(
+    Object.entries(extraDefinitions).map(([type, definition]) => [type, definition.label]),
+  ),
   RestTable: 'Tabla HTTP',
   Container: 'Contenedor',
   Heading: 'Título',
@@ -14,6 +18,9 @@ export const componentLabels: Record<string, string> = {
   ApiQuery: 'Consulta externa',
 };
 export const componentDescriptions: Record<string, string> = {
+  ...Object.fromEntries(
+    Object.entries(extraDefinitions).map(([type, definition]) => [type, definition.description]),
+  ),
   RestTable: 'Tabla conectada a tus rutas GET, POST, PUT y DELETE',
   Container: 'Agrupa y organiza otros elementos',
   Heading: 'Destaca una idea con un título',

@@ -1,3 +1,5 @@
+import { Plus, Sparkles } from 'lucide-react';
+import { PageOverview } from './PageOverview';
 import { usePages } from '../pages/hooks/usePages';
 import { PageTable } from '../pages/components/PageTable';
 import { PageFormDialog } from '../pages/components/PageFormDialog';
@@ -10,7 +12,9 @@ export function WorkspacePages() {
     <main className="workspace-content">
       <div className="workspace-heading">
         <div>
-          <span className="eyebrow">DISEÑA Y COMPARTE</span>
+          <span className="eyebrow">
+            <Sparkles size={13} aria-hidden="true" /> DISEÑA Y COMPARTE
+          </span>
           <h1>Mis páginas</h1>
           <p>
             Cada página es una pantalla de tu aplicación. Diseña, revisa y publica cuando esté
@@ -25,7 +29,7 @@ export function WorkspacePages() {
               state.setEditing(null);
             }}
           >
-            Crear página
+            <Plus size={17} aria-hidden="true" /> Crear página
           </button>
         )}
       </div>
@@ -35,6 +39,7 @@ export function WorkspacePages() {
           <button onClick={() => void state.load()}>Reintentar</button>
         </p>
       )}
+      {!state.loading && state.pages.length > 0 && <PageOverview pages={state.pages} />}
       <div className="context-tip">
         <strong>Tu trabajo, a tu ritmo.</strong> Guardar conserva tus cambios como borrador.
         Publicar los hace visibles para tu equipo.

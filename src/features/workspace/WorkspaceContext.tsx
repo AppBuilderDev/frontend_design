@@ -78,7 +78,10 @@ export function WorkspaceGate({ children }: { children: ReactNode }) {
           ?.filter((app) => !app.archived)
           .map((app) => (
             <p key={app.id}>
-              <a className="workspace-text-link" href={runtimeUrl + '/p/' + app.id + '/'}>
+              <a
+                className="workspace-text-link"
+                href={runtimeUrl + '/' + (app.slug ?? 'p/' + app.id) + '/'}
+              >
                 Abrir {app.organization} · {app.name}
               </a>
             </p>

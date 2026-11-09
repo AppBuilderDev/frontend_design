@@ -1,3 +1,5 @@
+import { extraDefinitions } from './catalog/definitions';
+import { extraRegistry } from './catalog/registry';
 import { RestTable } from './RestTable';
 import { ApiQuery } from './ApiQuery';
 import { ServiceForm } from './ServiceForm';
@@ -28,8 +30,10 @@ export const catalog = [
   'ServiceForm',
   'ApiQuery',
   'RestTable',
+  ...Object.keys(extraDefinitions),
 ] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
+  ...extraRegistry,
   RestTable,
   Inventory: InventoryPanel,
   ServiceForm,
@@ -63,7 +67,9 @@ export const registry: Record<string, ComponentType<ViewProps>> = {
     const context = useDataContext();
     const original = str(node.props.href);
     const href =
-      context && /^\/(?!\/)/.test(original) ? '/p/' + context.projectId + original : original;
+      context && /^\/(?!\/)/.test(original)
+        ? (context.applicationPath ?? '/p/' + context.projectId) + original
+        : original;
     const safe = /^(https?:\/\/|\/(?!\/)|#)/.test(href);
     const { color, backgroundColor } = style(node.props);
     const colors = { color, backgroundColor };
@@ -208,7 +214,10 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
 }
 export function ComponentView({ node, children }: ViewProps) {
   const View = Object.hasOwn(registry, node.type) ? registry[node.type] : undefined;
-  const wrapperStyle = style(node.props, node.type !== 'Container' && node.type !== 'Card');
+  const wrapperStyle = style(
+    node.props,
+    node.type !== 'Container' && node.type !== 'Card' && !extraDefinitions[node.type]?.container,
+  );
   if (node.type === 'Button') {
     delete wrapperStyle.color;
     delete wrapperStyle.backgroundColor;

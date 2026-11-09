@@ -1,6 +1,6 @@
 import { getProjectScope } from '../../../services/projectScope';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Save, Eye, Undo2, Redo2, Check, Send } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Undo2, Redo2, Check, Send, Code2 } from 'lucide-react';
 import type { Page } from '../../../models/contracts';
 interface Props {
   page: Page;
@@ -61,7 +61,7 @@ export function EditorToolbar({
           </strong>
           <small className="block">/{page.code}</small>
         </div>
-        <span className="editor-save-state">
+        <span className="editor-save-state" data-state={dirty ? 'dirty' : 'saved'}>
           <Check size={15} />
           {dirty ? 'Sin guardar' : 'Cambios guardados'}
         </span>
@@ -88,7 +88,7 @@ export function EditorToolbar({
           </>
         )}
         <button aria-pressed={codeOpen} onClick={onCode}>
-          Codigo
+          <Code2 size={15} aria-hidden="true" /> Codigo
         </button>
         <button disabled={readOnly} onClick={onPreview}>
           <Eye size={15} />

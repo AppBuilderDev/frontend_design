@@ -79,6 +79,7 @@ export interface MovementList {
   pageSize: number;
 }
 export interface ApplicationAccess {
+  slug?: string;
   id: string;
   name: string;
   organization: string;

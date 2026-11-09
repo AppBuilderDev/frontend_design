@@ -46,3 +46,11 @@ Esto habilita el experimento tecnico sobre el subconjunto declarado; no demuestr
 ## Probar el backend en Swagger
 
 Disponible en http://localhost:3001/docs/. Crear un recurso desde Rutas y endpoints habilita su CRUD sin escribir un controlador. Registrar una ruta solo guarda su contrato. Para logica propia usar los servicios configurables o programar un controlador Nest. Swagger muestra los recursos en rutas parametrizadas: por ejemplo key=productos.
+
+### URLs de aplicaciones
+
+Las paginas de un proyecto usan `/:appSlug/:pageCode`, por ejemplo `/test001/productos` o `/test001/reportes/ventas`. El backend asigna un slug global unico a cada proyecto a partir del nombre de la organizacion y conserva ese slug aunque cambie el nombre visible. Las coincidencias reciben sufijos (`test001-2`). La migracion de bases existentes es automatica y conserva los IDs y los datos.
+
+Los enlaces antiguos `/p/:projectId/:pageCode` redirigen a la URL con slug, conservando query y fragmento. Las rutas cortas como `/productos` siguen resolviendo entre los proyectos accesibles; si hay varios resultados se solicita elegir la aplicacion. Cambiar la URL no concede permisos: se mantienen la sesion, el acceso al proyecto y la exigencia de publicar la pagina. Los IDs siguen usandose internamente en la API.
+
+Catalogo ampliado: [45 componentes y sus opciones](docs/components.md).

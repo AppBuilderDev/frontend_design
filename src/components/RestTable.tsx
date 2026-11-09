@@ -23,6 +23,16 @@ function route(endpoint: Endpoint, projectId: string, id?: string) {
   return path.slice('/api/v1'.length);
 }
 export function RestTable({ node }: { node: ComponentNode }) {
+  const context = useDataContext();
+  const endpoint = context?.endpoints.find((item) => item.id === node.props.listEndpointId);
+  return (
+    <BoundRestTable
+      key={context?.projectId + ':' + endpoint?.id + ':' + endpoint?.revision}
+      node={node}
+    />
+  );
+}
+function BoundRestTable({ node }: { node: ComponentNode }) {
   const context = useDataContext(),
     [rows, setRows] = useState<Row[]>([]),
     [error, setError] = useState(''),
@@ -38,7 +48,7 @@ export function RestTable({ node }: { node: ComponentNode }) {
   const projectId = context?.projectId ?? '',
     preview = context?.preview ?? true;
   useEffect(() => {
-    if (!list || preview) return;
+    if (!list) return;
     const controller = new AbortController();
     platformRequest<unknown>(route(list, projectId), { signal: controller.signal })
       .then((data) => {
@@ -61,7 +71,7 @@ export function RestTable({ node }: { node: ComponentNode }) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [list, projectId, preview, revision]);
+  }, [list, projectId, revision]);
   if (!context || !list)
     return <p className="data-empty">Selecciona la ruta GET en Servicios HTTP.</p>;
   const fields = (editing === null ? create : update)?.fields ?? list.fields;
@@ -103,99 +113,104 @@ export function RestTable({ node }: { node: ComponentNode }) {
     <section className="data-panel rest-table">
       <div className="rest-table-toolbar">
         <h3>{String(node.props.title || 'Tabla HTTP')}</h3>
-        {create && context.canWrite && !preview && (
-          <button onClick={() => setEditing(null)}>Nuevo registro</button>
+        {create && context.canWrite && (
+          <button
+            disabled={preview}
+            title={preview ? 'Disponible en Runtime' : undefined}
+            onClick={() => setEditing(null)}
+          >
+            Nuevo registro
+          </button>
         )}
       </div>
-      {preview ? (
+      {preview && (
         <p className="data-hint">
-          GET: {list.path}. La vista previa no ejecuta escrituras. Publica para usar los servicios.
+          Vista de datos reales (GET). Crear, editar y eliminar estan disponibles en Runtime.
         </p>
-      ) : (
-        <>
-          {error && (
-            <p className="alert" role="alert">
-              {error}
-            </p>
-          )}
-          {loading && <p role="status">Cargando...</p>}
-          <button
-            disabled={busy}
-            onClick={() => {
-              setLoading(true);
-              setRevision((v) => v + 1);
-            }}
-          >
-            Actualizar tabla
-          </button>
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  {list.fields.map((f) => (
-                    <th key={f.key}>{f.label}</th>
-                  ))}
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id}>
-                    {list.fields.map((f) => (
-                      <td key={f.key}>
-                        {String(
-                          (row.values as Record<string, unknown> | undefined)?.[f.key] ??
-                            row[f.key] ??
-                            '',
-                        )}
-                      </td>
-                    ))}
-                    <td>
-                      <div className="actions">
-                        {update && context.canWrite && (
-                          <button
-                            disabled={busy}
-                            aria-label={'Editar registro ' + row.id}
-                            onClick={() => setEditing(row)}
-                          >
-                            Editar
-                          </button>
-                        )}
-                        {remove && context.canWrite && (
-                          <button
-                            disabled={busy}
-                            aria-label={'Eliminar registro ' + row.id}
-                            onClick={async () => {
-                              if (!window.confirm('Eliminar este registro?')) return;
-                              setBusy(true);
-                              try {
-                                await platformRequest(
-                                  route(remove, projectId, row.id) +
-                                    (row.revision ? '?revision=' + row.revision : ''),
-                                  { method: remove.method },
-                                );
-                                setLoading(true);
-                                setRevision((v) => v + 1);
-                              } catch (e) {
-                                setError((e as Error).message);
-                              } finally {
-                                setBusy(false);
-                              }
-                            }}
-                          >
-                            Eliminar
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {!rows.length && !loading && <p>No hay registros.</p>}
-        </>
       )}
+      <>
+        {error && (
+          <p className="alert" role="alert">
+            {error}
+          </p>
+        )}
+        {loading && <p role="status">Cargando...</p>}
+        <button
+          disabled={busy}
+          onClick={() => {
+            setLoading(true);
+            setRevision((v) => v + 1);
+          }}
+        >
+          Actualizar tabla
+        </button>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                {list.fields.map((f) => (
+                  <th key={f.key}>{f.label}</th>
+                ))}
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  {list.fields.map((f) => (
+                    <td key={f.key}>
+                      {String(
+                        (row.values as Record<string, unknown> | undefined)?.[f.key] ??
+                          row[f.key] ??
+                          '',
+                      )}
+                    </td>
+                  ))}
+                  <td>
+                    <div className="actions">
+                      {update && context.canWrite && (
+                        <button
+                          disabled={busy || preview}
+                          aria-label={'Editar registro ' + row.id}
+                          onClick={() => setEditing(row)}
+                        >
+                          Editar
+                        </button>
+                      )}
+                      {remove && context.canWrite && (
+                        <button
+                          disabled={busy || preview}
+                          aria-label={'Eliminar registro ' + row.id}
+                          onClick={async () => {
+                            if (!window.confirm('Eliminar este registro?')) return;
+                            setBusy(true);
+                            try {
+                              await platformRequest(
+                                route(remove, projectId, row.id) +
+                                  (row.revision ? '?revision=' + row.revision : ''),
+                                { method: remove.method },
+                              );
+                              setLoading(true);
+                              setRevision((v) => v + 1);
+                            } catch (e) {
+                              setError((e as Error).message);
+                            } finally {
+                              setBusy(false);
+                            }
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {!rows.length && !loading && <p>No hay registros.</p>}
+      </>
       {editing !== undefined && !preview && (
         <form onSubmit={save} className="rest-record-form">
           <h3>{editing ? 'Editar registro' : 'Nuevo registro'}</h3>

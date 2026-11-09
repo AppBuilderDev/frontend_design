@@ -11,7 +11,7 @@ test('ruta corta exige acceso y publicación y abre la URL del proyecto', async 
   const password = 'Ruta-segura-123456';
   const signup = await context.request.post(api + '/auth/register', {
     headers,
-    data: { name: 'Ruta', organization: 'UNSA', email, password },
+    data: { name: 'Ruta', organization: 'Rutas bonitas', email, password },
   });
   expect(signup.ok()).toBe(true);
   const session = await signup.json();
@@ -38,7 +38,14 @@ test('ruta corta exige acceso y publicación y abre la URL del proyecto', async 
   });
   expect(published.ok()).toBe(true);
   await page.reload();
-  await expect(page).toHaveURL(`http://127.0.0.1:5184/p/${project}/unsa`);
+  await expect(page).toHaveURL(`http://127.0.0.1:5184/${session.projects[0].slug}/unsa`);
+  await expect(page.getByRole('heading', { name: 'UNSA Tareas', exact: true })).toBeVisible();
+
+  await page.goto(`http://127.0.0.1:5184/p/${project}/unsa?vista=tabla#titulo`);
+  await expect(page).toHaveURL(
+    `http://127.0.0.1:5184/${session.projects[0].slug}/unsa?vista=tabla#titulo`,
+  );
+  await page.reload();
   await expect(page.getByRole('heading', { name: 'UNSA Tareas', exact: true })).toBeVisible();
 
   const anonymous = await browser.newContext();
@@ -60,7 +67,12 @@ test('ruta corta exige acceso y publicación y abre la URL del proyecto', async 
         ...session,
         projects: [
           session.projects[0],
-          { ...session.projects[0], id: 'second-project', name: 'Otro proyecto' },
+          {
+            ...session.projects[0],
+            id: 'second-project',
+            slug: 'otro-proyecto',
+            name: 'Otro proyecto',
+          },
         ],
       },
     }),

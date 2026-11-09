@@ -67,6 +67,7 @@ export interface RecordList {
 }
 export type ProjectRole = 'owner' | 'editor' | 'reader';
 export interface ProjectAccess {
+  slug?: string;
   id: string;
   organizationId: string;
   organization: string;

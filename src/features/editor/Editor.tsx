@@ -62,6 +62,7 @@ export function Editor() {
       {scope ? (
         <DataProvider
           endpoints={endpoints}
+          applicationPath={'/' + (scope.slug ?? 'p/' + scope.id)}
           projectId={scope.id}
           entities={entities}
           operations={operations.flatMap((o) =>
@@ -274,7 +275,12 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
         {dirty ? 'Cambios pendientes' : 'Todos los cambios guardados'}
         <a
           href={
-            runtimeUrl + (getProjectScope() ? '/p/' + getProjectScope()!.id : '') + '/' + page.code
+            runtimeUrl +
+            (getProjectScope()
+              ? '/' + (getProjectScope()!.slug ?? 'p/' + getProjectScope()!.id)
+              : '') +
+            '/' +
+            page.code
           }
           target="_blank"
           rel="noreferrer"

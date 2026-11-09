@@ -1,3 +1,5 @@
+import { CodePanel } from './code/CodePanel';
+import { toCraft } from './craft/adapter';
 import { useEndpoints } from '../workspace/useEndpoints';
 import { EditorLibrary } from './components/EditorLibrary';
 import { useConnections } from '../workspace/useConnections';
@@ -6,7 +8,7 @@ import { DataProvider } from '../../components/dataComponents';
 import { getProjectScope } from '../../services/projectScope';
 import { useEntities } from '../workspace/useEntities';
 import { Editor as CraftEditor } from '@craftjs/core';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Layers, Blocks, X } from 'lucide-react';
 import { useEditor } from './hooks/useEditor';
@@ -82,9 +84,17 @@ export function Editor() {
 
 function Workspace({ session, page }: { session: Session; page: Page }) {
   const [initialNodes] = useState(page.components);
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [codePending, setCodePending] = useState(false);
   const commands = useEditorCommands({
     preview: session.preview,
-    onSave: (nodes) => void session.save(nodes),
+    onSave: (nodes) => {
+      if (codePending) {
+        window.alert('Aplica o descarta el codigo antes de guardar.');
+        return;
+      }
+      void session.save(nodes);
+    },
   });
   const {
     actions,
@@ -102,6 +112,29 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
   const library = useBlocks();
   const [tab, setTab] = useState<'components' | 'blocks' | 'layers' | null>('components');
   const [dismissedInspector, setDismissedInspector] = useState('');
+  const onCodePending = useCallback((pending: boolean) => setCodePending(pending), []);
+  useEffect(() => {
+    const warn = (event: BeforeUnloadEvent) => {
+      if (codePending) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [codePending]);
+  const applyCode = (items: ComponentNode[]) => {
+    actions.deserialize(toCraft(items));
+    actions.selectNode();
+    session.change(items);
+  };
+  const savePage = (publish = false) => {
+    if (codePending) {
+      window.alert('Aplica o descarta los cambios de codigo antes de guardar.');
+      return;
+    }
+    void session.save(nodes, publish);
+  };
 
   const changeProperty = (key: string, value: string) =>
     actions.history.throttle(400).setProp(selected, (props) => {
@@ -113,12 +146,14 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
     <div className={'editor-shell studio-editor classic-editor' + (preview ? ' is-preview' : '')}>
       <EditorToolbar
         page={page}
-        dirty={dirty}
+        dirty={dirty || codePending}
         preview={preview}
         busy={busy}
+        codeOpen={codeOpen}
+        onCode={() => setCodeOpen(!codeOpen)}
         onPreview={() => session.setPreview(!preview)}
-        onSave={() => void session.save(nodes)}
-        onPublish={() => void session.save(nodes, true)}
+        onSave={() => savePage()}
+        onPublish={() => savePage(true)}
         canUndo={canUndo}
         canRedo={canRedo}
         onUndo={() => commands.history('undo')}
@@ -129,6 +164,14 @@ function Workspace({ session, page }: { session: Session; page: Page }) {
           {error}
         </div>
       )}
+      <div hidden={!codeOpen}>
+        <CodePanel
+          nodes={nodes}
+          onApply={applyCode}
+          onPending={onCodePending}
+          readOnly={getProjectScope()?.role === 'reader'}
+        />
+      </div>
       <div className="editor-body">
         {!preview && (
           <aside className="editor-left studio-library" aria-label="Biblioteca del editor">

@@ -7,6 +7,8 @@ interface Props {
   dirty: boolean;
   preview: boolean;
   busy: boolean;
+  codeOpen: boolean;
+  onCode: () => void;
   onPreview: () => void;
   onSave: () => void;
   onPublish?: () => void;
@@ -20,6 +22,8 @@ export function EditorToolbar({
   dirty,
   preview,
   busy,
+  codeOpen,
+  onCode,
   onPreview,
   onSave: save,
   onPublish,
@@ -83,6 +87,9 @@ export function EditorToolbar({
             </button>
           </>
         )}
+        <button aria-pressed={codeOpen} onClick={onCode}>
+          Codigo
+        </button>
         <button disabled={readOnly} onClick={onPreview}>
           <Eye size={15} />
           {preview ? 'Editar' : 'Vista previa'}

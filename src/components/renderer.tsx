@@ -1,3 +1,4 @@
+import { RestTable } from './RestTable';
 import { ApiQuery } from './ApiQuery';
 import { ServiceForm } from './ServiceForm';
 import { InventoryPanel } from './InventoryPanel';
@@ -26,8 +27,10 @@ export const catalog = [
   'Inventory',
   'ServiceForm',
   'ApiQuery',
+  'RestTable',
 ] as const;
 export const registry: Record<string, ComponentType<ViewProps>> = {
+  RestTable,
   Inventory: InventoryPanel,
   ServiceForm,
   ApiQuery,

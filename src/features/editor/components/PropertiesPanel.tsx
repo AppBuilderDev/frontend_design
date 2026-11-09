@@ -267,6 +267,45 @@ export function PropertiesPanel({
               </label>
             </>
           )}
+          {node.type === 'RestTable' && (
+            <>
+              <div className="panel-heading">Servicios HTTP</div>
+              {[
+                ['listEndpointId', 'Ruta GET', ['GET']],
+                ['createEndpointId', 'Ruta POST', ['POST']],
+                ['updateEndpointId', 'Ruta PUT o PATCH', ['PUT', 'PATCH']],
+                ['deleteEndpointId', 'Ruta DELETE', ['DELETE']],
+              ].map(([key, label, methods]) => (
+                <label key={String(key)}>
+                  {String(label)}
+                  <select
+                    aria-label={String(label)}
+                    value={String(node.props[String(key)] ?? '')}
+                    onChange={(e) => prop(String(key), e.target.value)}
+                  >
+                    <option value="">Sin vincular</option>
+                    {data?.endpoints
+                      .filter((e) => (methods as string[]).includes(e.method))
+                      .map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {e.name} - {e.method}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              ))}
+              <label>
+                Titulo de tabla
+                <input
+                  value={String(node.props.title ?? '')}
+                  onChange={(e) => prop('title', e.target.value)}
+                />
+              </label>
+              <small>
+                Administra las definiciones en Rutas y endpoints. Publicar captura sus contratos.
+              </small>
+            </>
+          )}
           {['DataForm', 'DataTable', 'DataDetail'].includes(node.type) && (
             <>
               <div className="panel-heading">Conexión de datos</div>

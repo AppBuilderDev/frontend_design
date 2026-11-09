@@ -1,3 +1,4 @@
+import { endpointSchema, type Endpoint } from './endpoints';
 import { connectionContractSchema, type ConnectionContract } from './connections';
 import { operationContractSchema, type OperationContract } from './operations';
 import { entitySchema, type Entity } from './data';
@@ -9,6 +10,7 @@ export interface ComponentNode {
   children?: ComponentNode[];
 }
 export interface Page {
+  endpoints?: Endpoint[];
   id: string;
   name: string;
   code: string;
@@ -62,6 +64,7 @@ export const pageSchema = pageInputSchema.extend({
   id: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  endpoints: z.array(endpointSchema).optional(),
   revision: z.number().int().optional(),
   projectId: z.string().optional(),
   entities: z.array(entitySchema).optional(),

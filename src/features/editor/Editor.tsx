@@ -1,3 +1,4 @@
+import { useEndpoints } from '../workspace/useEndpoints';
 import { EditorLibrary } from './components/EditorLibrary';
 import { useConnections } from '../workspace/useConnections';
 import { useOperations } from '../workspace/useOperations';
@@ -31,6 +32,7 @@ export function Editor() {
   const { entities } = useEntities(scope?.id);
   const { operations } = useOperations(scope?.id);
   const { connections } = useConnections(scope?.id);
+  const { endpoints } = useEndpoints(scope?.id);
   if (!session.page)
     return (
       <main className="screen-message">
@@ -57,6 +59,7 @@ export function Editor() {
     >
       {scope ? (
         <DataProvider
+          endpoints={endpoints}
           projectId={scope.id}
           entities={entities}
           operations={operations.flatMap((o) =>

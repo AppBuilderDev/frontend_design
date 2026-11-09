@@ -1,4 +1,11 @@
 export const defaults: Record<string, Record<string, unknown>> = {
+  RestTable: {
+    title: 'Tabla HTTP',
+    listEndpointId: '',
+    createEndpointId: '',
+    updateEndpointId: '',
+    deleteEndpointId: '',
+  },
   ApiQuery: { connectionId: '', buttonText: 'Consultar' },
   ServiceForm: { operationId: '', buttonText: 'Ejecutar servicio' },
   Inventory: { title: 'Inventario' },

@@ -1,3 +1,4 @@
+import { WorkspaceRoutes } from './WorkspaceRoutes';
 import { WorkspaceInventory } from './WorkspaceInventory';
 import { Link, NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import {
@@ -63,6 +64,7 @@ function WorkspaceShell() {
           {[
             { to: 'pages', label: 'Mis páginas', Icon: FileText },
             { to: 'data', label: 'Mis datos', Icon: Database },
+            { to: 'routes', label: 'Rutas y endpoints', Icon: Workflow },
             { to: 'services', label: 'Acciones y conexiones', Icon: Workflow },
             { to: 'inventory', label: 'Inventario', Icon: Package },
             { to: 'team', label: 'Equipo y proyecto', Icon: Users },
@@ -116,6 +118,7 @@ function WorkspaceShell() {
           <Routes>
             <Route index element={<Navigate to="pages" replace />} />
             <Route path="pages" element={<WorkspacePages />} />
+            <Route path="routes" element={<WorkspaceRoutes />} />
             <Route path="data" element={<WorkspaceData />} />
             <Route path="inventory" element={<WorkspaceInventory />} />
             <Route path="services" element={<WorkspaceServices />} />

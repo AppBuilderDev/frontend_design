@@ -1,4 +1,5 @@
 export const componentLabels: Record<string, string> = {
+  RestTable: 'Tabla HTTP',
   Container: 'Contenedor',
   Heading: 'Título',
   Paragraph: 'Texto',
@@ -13,6 +14,7 @@ export const componentLabels: Record<string, string> = {
   ApiQuery: 'Consulta externa',
 };
 export const componentDescriptions: Record<string, string> = {
+  RestTable: 'Tabla conectada a tus rutas GET, POST, PUT y DELETE',
   Container: 'Agrupa y organiza otros elementos',
   Heading: 'Destaca una idea con un título',
   Paragraph: 'Añade una descripción o un mensaje',

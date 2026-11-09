@@ -1,3 +1,4 @@
+import type { Endpoint } from '../models/endpoints';
 import type { ConnectionContract } from '../models/connections';
 import type { OperationContract } from '../models/operations';
 import {
@@ -21,6 +22,7 @@ import {
 } from '../models/data';
 import { ApiError, platformRequest } from '../services/platformHttp';
 interface DataState {
+  endpoints: Endpoint[];
   connections: ConnectionContract[];
   operations: OperationContract[];
   projectId: string;
@@ -38,6 +40,7 @@ export function DataProvider({
   projectId,
   entities,
   canWrite,
+  endpoints = [],
   operations = [],
   connections = [],
   preview = false,
@@ -46,6 +49,7 @@ export function DataProvider({
   projectId: string;
   entities: Entity[];
   canWrite: boolean;
+  endpoints?: Endpoint[];
   operations?: OperationContract[];
   connections?: ConnectionContract[];
   preview?: boolean;
@@ -61,6 +65,7 @@ export function DataProvider({
   return (
     <DataContext.Provider
       value={{
+        endpoints,
         projectId,
         entities,
         operations,

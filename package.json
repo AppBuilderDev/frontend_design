@@ -15,7 +15,8 @@
     "test:e2e": "playwright test --config playwright.platform.config.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:e2e:legacy": "playwright test --config playwright.config.ts"
+    "test:e2e:legacy": "playwright test --config playwright.config.ts",
+    "test:experiment": "vitest run tests/sync-experiment.test.ts"
   },
   "dependencies": {
     "@craftjs/core": "^0.2.12",
